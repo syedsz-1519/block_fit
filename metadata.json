@@ -1,0 +1,6 @@
+{
+  "name": "Block Fit",
+  "description": "A responsive, modern block-fitting puzzle game featuring satisfying tactile touch controls, multiple levels, custom themes (light/dark mode), social sharing, and real-time cross-platform progress synchronization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
