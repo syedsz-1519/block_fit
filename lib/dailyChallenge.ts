@@ -135,15 +135,17 @@ export function generateDailyChallenge(dateStr: string): DailyChallengeLevel {
   }
 
   const colors = [
-    'bg-sage border-b-3 border-[#8ba89a]',
-    'bg-coral border-b-3 border-[#c07d72]',
-    'bg-mustard border-b-3 border-[#c8a86e]',
-    'bg-teal border-b-3 border-[#71a39f]',
-    'bg-lavender border-b-3 border-[#a8a5a1]',
-    'bg-[#a8cfbd] border-b-3 border-[#8ba89a]',
-    'bg-[#e49a8e] border-b-3 border-[#c07d72]',
-    'bg-[#e6c88e] border-b-3 border-[#c8a86e]',
-    'bg-[#8ec9c4] border-b-3 border-[#71a39f]',
+    'bg-sage border-b-3 border-sage-dark shadow-sm',
+    'bg-coral border-b-3 border-coral-dark shadow-sm',
+    'bg-mustard border-b-3 border-mustard-dark shadow-sm',
+    'bg-teal border-b-3 border-teal-dark shadow-sm',
+    'bg-lavender border-b-3 border-lavender-dark shadow-sm',
+    'bg-[#5c6ac4] border-b-3 border-[#3f4eae] shadow-sm',
+    'bg-[#ec4899] border-b-3 border-[#be185d] shadow-sm',
+    'bg-[#10b981] border-b-3 border-[#047857] shadow-sm',
+    'bg-[#f59e0b] border-b-3 border-[#b45309] shadow-sm',
+    'bg-[#0ea5e9] border-b-3 border-[#0369a1] shadow-sm',
+    'bg-[#8b5cf6] border-b-3 border-[#6d28d9] shadow-sm',
   ];
 
   const blockNames = ['Mono', 'Domino', 'Tromino', 'Tetromino', 'Pentomino'];

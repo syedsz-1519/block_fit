@@ -37,17 +37,17 @@ export const PRESET_LEVELS: LevelConfig[] = [
     availableBlocks: [
       {
         cells: [[0, 0], [1, 0]],
-        color: "bg-sage border-b-3 border-[#8ba89a]",
+        color: "bg-sage border-b-3 border-sage-dark",
         name: "Domino"
       },
       {
         cells: [[0, 0], [0, 1], [1, 1]],
-        color: "bg-coral border-b-3 border-[#c07d72]",
+        color: "bg-coral border-b-3 border-coral-dark",
         name: "L-Tromino"
       },
       {
         cells: [[0, 0], [1, 0], [0, 1], [1, 1]],
-        color: "bg-mustard border-b-3 border-[#c8a86e]",
+        color: "bg-mustard border-b-3 border-mustard-dark",
         name: "Square-Tetromino"
       }
     ],
@@ -69,22 +69,22 @@ export const PRESET_LEVELS: LevelConfig[] = [
     availableBlocks: [
       {
         cells: [[0, 0], [1, 0], [2, 0]],
-        color: "bg-teal border-b-3 border-[#71a39f]",
+        color: "bg-teal border-b-3 border-teal-dark",
         name: "I-Tromino"
       },
       {
         cells: [[0, 0], [0, 1], [1, 1]],
-        color: "bg-coral border-b-3 border-[#c07d72]",
+        color: "bg-coral border-b-3 border-coral-dark",
         name: "L-Tromino"
       },
       {
         cells: [[0, 0], [1, 0], [1, 1], [2, 1]],
-        color: "bg-lavender border-b-3 border-[#a8a5a1]",
+        color: "bg-lavender border-b-3 border-lavender-dark",
         name: "Z-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [1, 1], [0, 1]],
-        color: "bg-mustard border-b-3 border-[#c8a86e]",
+        color: "bg-mustard border-b-3 border-mustard-dark",
         name: "Square-Tetromino"
       }
     ],
@@ -107,22 +107,22 @@ export const PRESET_LEVELS: LevelConfig[] = [
     availableBlocks: [
       {
         cells: [[0, 0], [1, 0], [2, 0], [1, 1]],
-        color: "bg-sage border-b-3 border-[#8ba89a]",
+        color: "bg-sage border-b-3 border-sage-dark",
         name: "T-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [2, 0]],
-        color: "bg-teal border-b-3 border-[#71a39f]",
+        color: "bg-teal border-b-3 border-teal-dark",
         name: "I-Tromino"
       },
       {
         cells: [[0, 0], [0, 1], [1, 1], [2, 1]],
-        color: "bg-coral border-b-3 border-[#c07d72]",
+        color: "bg-coral border-b-3 border-coral-dark",
         name: "L-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [0, 1]],
-        color: "bg-lavender border-b-3 border-[#a8a5a1]",
+        color: "bg-lavender border-b-3 border-lavender-dark",
         name: "L-Tromino"
       }
     ],
@@ -145,22 +145,22 @@ export const PRESET_LEVELS: LevelConfig[] = [
     availableBlocks: [
       {
         cells: [[0, 0], [1, 0], [2, 0], [3, 0]],
-        color: "bg-teal border-b-3 border-[#71a39f]",
+        color: "bg-teal border-b-3 border-teal-dark",
         name: "Long I-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [0, 1], [1, 1]],
-        color: "bg-mustard border-b-3 border-[#c8a86e]",
+        color: "bg-mustard border-b-3 border-mustard-dark",
         name: "Square-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [2, 0], [1, 1]],
-        color: "bg-coral border-b-3 border-[#c07d72]",
+        color: "bg-coral border-b-3 border-coral-dark",
         name: "T-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [1, 1], [2, 1]],
-        color: "bg-lavender border-b-3 border-[#a8a5a1]",
+        color: "bg-lavender border-b-3 border-lavender-dark",
         name: "Z-Tetromino"
       }
     ],
@@ -183,22 +183,22 @@ export const PRESET_LEVELS: LevelConfig[] = [
     availableBlocks: [
       {
         cells: [[0, 0], [0, 1], [1, 1], [1, 2]],
-        color: "bg-sage border-b-3 border-[#8ba89a]",
+        color: "bg-sage border-b-3 border-sage-dark",
         name: "Z-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [2, 0], [0, 1]],
-        color: "bg-coral border-b-3 border-[#c07d72]",
+        color: "bg-coral border-b-3 border-coral-dark",
         name: "J-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [2, 0]],
-        color: "bg-teal border-b-3 border-[#71a39f]",
+        color: "bg-teal border-b-3 border-teal-dark",
         name: "I-Tromino"
       },
       {
         cells: [[0, 0], [0, 1], [1, 1]],
-        color: "bg-mustard border-b-3 border-[#c8a86e]",
+        color: "bg-mustard border-b-3 border-mustard-dark",
         name: "L-Tromino"
       }
     ],
@@ -220,12 +220,12 @@ export const PRESET_LEVELS: LevelConfig[] = [
     parMoves: 6,
     parTime: 100,
     availableBlocks: [
-      { cells: [[0, 0], [1, 0], [2, 0], [3, 0]], color: "bg-teal border-b-3 border-[#71a39f]", name: "I-Tetromino" },
-      { cells: [[0, 0], [1, 0], [2, 0], [0, 1]], color: "bg-coral border-b-3 border-[#c07d72]", name: "L-Tetromino" },
-      { cells: [[0, 0], [1, 0], [1, 1], [2, 1]], color: "bg-sage border-b-3 border-[#8ba89a]", name: "Z-Tetromino" },
-      { cells: [[0, 0], [1, 0], [0, 1], [1, 1]], color: "bg-mustard border-b-3 border-[#c8a86e]", name: "Square-Tetromino" },
-      { cells: [[0, 0], [1, 0], [2, 0], [1, 1]], color: "bg-lavender border-b-3 border-[#a8a5a1]", name: "T-Tetromino" },
-      { cells: [[0, 0], [1, 0], [2, 0], [0, 1], [0, 2]], color: "bg-teal border-b-3 border-[#71a39f]", name: "L-Pentomino" }
+      { cells: [[0, 0], [1, 0], [2, 0], [3, 0]], color: "bg-teal border-b-3 border-teal-dark", name: "I-Tetromino" },
+      { cells: [[0, 0], [1, 0], [2, 0], [0, 1]], color: "bg-coral border-b-3 border-coral-dark", name: "L-Tetromino" },
+      { cells: [[0, 0], [1, 0], [1, 1], [2, 1]], color: "bg-sage border-b-3 border-sage-dark", name: "Z-Tetromino" },
+      { cells: [[0, 0], [1, 0], [0, 1], [1, 1]], color: "bg-mustard border-b-3 border-mustard-dark", name: "Square-Tetromino" },
+      { cells: [[0, 0], [1, 0], [2, 0], [1, 1]], color: "bg-lavender border-b-3 border-lavender-dark", name: "T-Tetromino" },
+      { cells: [[0, 0], [1, 0], [2, 0], [0, 1], [0, 2]], color: "bg-teal border-b-3 border-teal-dark", name: "L-Pentomino" }
     ],
     hintSequence: [
       { blockIndex: 0, x: 0, y: 0, rotations: 0, mirrored: false },
@@ -249,27 +249,27 @@ export const PRESET_LEVELS: LevelConfig[] = [
     availableBlocks: [
       {
         cells: [[0, 0], [0, 1], [0, 2], [1, 2]],
-        color: "bg-[#a8cfbd] border-b-3 border-[#8ba89a]", // Sage
+        color: "bg-[#a8cfbd] border-b-3 border-sage-dark", // Sage
         name: "L-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [2, 0], [1, 1]],
-        color: "bg-[#c9c6c2] border-b-3 border-[#a8a5a1]", // Lavender
+        color: "bg-[#c9c6c2] border-b-3 border-lavender-dark", // Lavender
         name: "T-Tetromino"
       },
       {
         cells: [[0, 0], [0, 1], [1, 1], [1, 2], [0, 2]],
-        color: "bg-[#e49a8e] border-b-3 border-[#c07d72]", // Coral
+        color: "bg-[#e49a8e] border-b-3 border-coral-dark", // Coral
         name: "P-Pentomino"
       },
       {
         cells: [[0, 0], [1, 0], [0, 1], [1, 1]],
-        color: "bg-[#e6c88e] border-b-3 border-[#c8a86e]", // Mustard
+        color: "bg-[#e6c88e] border-b-3 border-mustard-dark", // Mustard
         name: "Square-Tetromino"
       },
       {
         cells: [[0, 0], [1, 0], [2, 0], [3, 0]],
-        color: "bg-[#8ec9c4] border-b-3 border-[#71a39f]", // Teal
+        color: "bg-[#8ec9c4] border-b-3 border-teal-dark", // Teal
         name: "I-Tetromino"
       }
     ],
@@ -302,11 +302,11 @@ for (let i = 1; i <= 50; i++) {
 
   // Pre-configured block shapes
   const colors = [
-    "bg-sage border-b-3 border-[#8ba89a]",
-    "bg-coral border-b-3 border-[#c07d72]",
-    "bg-mustard border-b-3 border-[#c8a86e]",
-    "bg-teal border-b-3 border-[#71a39f]",
-    "bg-lavender border-b-3 border-[#a8a5a1]"
+    "bg-sage border-b-3 border-sage-dark",
+    "bg-coral border-b-3 border-coral-dark",
+    "bg-mustard border-b-3 border-mustard-dark",
+    "bg-teal border-b-3 border-teal-dark",
+    "bg-lavender border-b-3 border-lavender-dark"
   ];
 
   const genericShapes: Omit<BlockShape, 'id'>[] = [

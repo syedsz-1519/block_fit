@@ -1,1 +1,52 @@
 @import "tailwindcss";
+
+@theme {
+  /* Premium HSL-Tailored Color Palette */
+  --color-sage: #6d8f7f;
+  --color-coral: #dd6b55;
+  --color-mustard: #f3b33e;
+  --color-teal: #4aa0a5;
+  --color-lavender: #9c97b3;
+  --color-indigo-custom: #5c6ac4;
+  --color-rose-custom: #ec4899;
+  --color-emerald-custom: #10b981;
+  --color-amber-custom: #f59e0b;
+  --color-sky-custom: #0ea5e9;
+  --color-violet-custom: #8b5cf6;
+}
+
+/* Custom styling for sleek block borders and animations */
+.bg-sage { background-color: var(--color-sage); }
+.border-sage-dark { border-color: #527061; }
+
+.bg-coral { background-color: var(--color-coral); }
+.border-coral-dark { border-color: #b84e3a; }
+
+.bg-mustard { background-color: var(--color-mustard); }
+.border-mustard-dark { border-color: #c68f29; }
+
+.bg-teal { background-color: var(--color-teal); }
+.border-teal-dark { border-color: #367e82; }
+
+.bg-lavender { background-color: var(--color-lavender); }
+.border-lavender-dark { border-color: #7a7593; }
+
+/* Glowing shadows and smooth micro-animations */
+.block-hover-effect {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+.block-hover-effect:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15);
+}
+
+/* Custom styling for cells and board */
+.cell-glow-neon {
+  box-shadow: 0 0 8px rgba(255, 0, 127, 0.4);
+}
+.cell-glow-sunset {
+  box-shadow: 0 0 8px rgba(252, 163, 17, 0.4);
+}
+.cell-glow-retro {
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+}

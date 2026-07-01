@@ -1392,7 +1392,7 @@ export default function App() {
     const cellHeight = boardRect.height / activeLevel.gridHeight;
 
     const dragLeft = e.clientX - boardRect.left - dragOffset.x;
-    const dragTop = e.clientY - boardRect.top - dragOffset.y;
+    const dragTop = (e.clientY - 45) - boardRect.top - dragOffset.y;
 
     const gridX = Math.round(dragLeft / cellWidth);
     const gridY = Math.round(dragTop / cellHeight);
@@ -1731,24 +1731,49 @@ export default function App() {
   // Themes list
   const THEME_CLASSES = {
     light: 'light bg-[#fdf8f8] text-gray-900',
-    dark: 'dark bg-[#121212] text-gray-100',
+    dark: 'dark bg-[#0F172A] text-gray-100',
     neon: 'neon bg-[#07051a] text-[#00ffcc]',
     sunset: 'sunset bg-[#241315] text-[#fca311]',
     retro: 'retro bg-[#0a1005] text-[#39ff14]'
   };
 
+  // Get dynamic board container wrapper class
+  const getBoardClass = () => {
+    switch (profile.theme) {
+      case 'dark':
+        return 'bg-[#18181b]/90 p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_4px_12px_rgba(0,0,0,0.6)] gap-1 border border-[#27272a]';
+      case 'neon':
+        return 'bg-[#0f0b29]/95 p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_0_20px_rgba(255,0,127,0.15)] gap-1 border border-[#ff007f]/30';
+      case 'sunset':
+        return 'bg-[#1c0c0e]/95 p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_4px_12px_rgba(0,0,0,0.8)] gap-1 border border-[#fca311]/30';
+      case 'retro':
+        return 'bg-[#040602]/95 p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_4px_12px_rgba(0,0,0,0.8)] gap-1 border border-[#39ff14]/30';
+      default:
+        return 'bg-[#EBE7E2] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(0,0,0,0.04)] gap-1 border border-[#DFDAD4]';
+    }
+  };
+
   // Get dynamic cell backgrounds for board
   const getCellBgClass = (state: 'empty' | 'blocked' | 'filled', color?: string) => {
-    if (state === 'blocked') return 'bg-[#2D2D2D] border border-gray-800';
     if (state === 'filled') return color || 'bg-sage';
+    
+    if (state === 'blocked') {
+      switch (profile.theme) {
+        case 'dark': return 'bg-[#141416]/80 border border-gray-900/40 opacity-40 shadow-inner';
+        case 'neon': return 'bg-[#07051a]/80 border border-[#ff007f]/5 opacity-30';
+        case 'sunset': return 'bg-[#1c0c0e]/80 border border-[#fca311]/5 opacity-30';
+        case 'retro': return 'bg-[#040602]/80 border border-[#39ff14]/5 opacity-30';
+        default: return 'bg-[#E5E0DA]/80 border border-[#D5D0CA]/40 shadow-inner';
+      }
+    }
     
     // Empty state
     switch (profile.theme) {
-      case 'dark': return 'bg-[#1e1e1e] border border-gray-800';
-      case 'neon': return 'bg-[#150f38] border border-[#ff007f]/30';
-      case 'sunset': return 'bg-[#3a1d21] border border-[#fca311]/20';
-      case 'retro': return 'bg-[#14200c] border border-[#39ff14]/30';
-      default: return 'bg-[#F5F2EF] border border-gray-200';
+      case 'dark': return 'bg-[#202023] border border-gray-800/80 shadow-[inset_0_1px_3px_rgba(0,0,0,0.2)]';
+      case 'neon': return 'bg-[#150f38] border border-[#ff007f]/20 shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]';
+      case 'sunset': return 'bg-[#3a1d21] border border-[#fca311]/15 shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]';
+      case 'retro': return 'bg-[#14200c] border border-[#39ff14]/20 shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]';
+      default: return 'bg-[#F5F2EF] border border-[#EBE7E2] shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]';
     }
   };
 
@@ -3260,7 +3285,7 @@ export default function App() {
             ) : (
               <div 
                 ref={boardRef}
-                className="bg-gray-200/60 dark:bg-gray-900/40 p-2.5 rounded-3xl grid w-full max-w-[360px] aspect-square shadow-inner gap-1 border border-gray-300/40 dark:border-gray-800/40"
+                className={getBoardClass()}
                 style={{
                   gridTemplateColumns: `repeat(${activeLevel.gridWidth}, minmax(0, 1fr))`,
                   gridTemplateRows: `repeat(${activeLevel.gridHeight}, minmax(0, 1fr))`
@@ -3301,6 +3326,8 @@ export default function App() {
                       <div 
                         key={`${r}-${c}`}
                         className={`relative w-full aspect-square rounded-xl transition-all duration-150 flex items-center justify-center ${getCellBgClass(state, colorClass)} ${
+                          state === 'filled' ? 'block-tactile' : ''
+                        } ${
                           isGhostCoordinate 
                             ? isGhostValid 
                               ? 'border-2 border-emerald-500 bg-emerald-500/25 scale-95 shadow-lg animate-pulse' 
@@ -3317,12 +3344,23 @@ export default function App() {
                       >
                         {/* Grid index dots or simple minimalist aesthetics */}
                         {!placingInfo && !isBlocked && (
-                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400/20" />
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            profile.theme === 'neon' ? 'bg-[#ff007f]/50 shadow-[0_0_4px_#ff007f]' :
+                            profile.theme === 'sunset' ? 'bg-[#fca311]/50 shadow-[0_0_4px_#fca311]' :
+                            profile.theme === 'retro' ? 'bg-[#39ff14]/50 shadow-[0_0_4px_#39ff14]' :
+                            profile.theme === 'dark' ? 'bg-zinc-700/65' : 'bg-gray-400/40'
+                          }`} />
                         )}
                         
                         {/* Blocked obstacle graphics */}
                         {isBlocked && (
-                          <div className="w-1/2 h-1/2 rounded bg-gray-700 dark:bg-gray-800 shadow" />
+                          <div className={`w-3.5 h-3.5 rounded-md ${
+                            profile.theme === 'neon' ? 'bg-[#ff007f]/10 border border-[#ff007f]/30' :
+                            profile.theme === 'sunset' ? 'bg-[#fca311]/10 border border-[#fca311]/30' :
+                            profile.theme === 'retro' ? 'bg-[#39ff14]/10 border border-[#39ff14]/30' :
+                            profile.theme === 'dark' ? 'bg-zinc-800/60 border border-zinc-700/40' :
+                            'bg-gray-300/60 border border-gray-400/40 shadow-sm'
+                          }`} />
                         )}
 
                         {/* Colorblind Pattern Assist Overlay */}
@@ -3478,7 +3516,7 @@ export default function App() {
                             <div 
                               key={`${r}-${c}`}
                               className={`relative w-5.5 h-5.5 rounded ${
-                                isOccupied ? block.color : 'bg-transparent'
+                                isOccupied ? `${block.color} block-tactile` : 'bg-transparent'
                               }`}
                             >
                               {isOccupied && profile.colorblindMode && (
@@ -3516,7 +3554,7 @@ export default function App() {
               style={{
                 position: 'fixed',
                 left: dragPosition.x - dragOffset.x,
-                top: dragPosition.y - dragOffset.y,
+                top: dragPosition.y - dragOffset.y - 45, // Elevated by 45px above touch point
                 pointerEvents: 'none',
                 zIndex: 100,
                 opacity: 0.9,
@@ -3538,7 +3576,7 @@ export default function App() {
                       <div 
                         key={`${r}-${c}`}
                         className={`relative w-8 h-8 rounded-lg shadow-xl ${
-                          isOccupied ? draggedBlock.color : 'bg-transparent'
+                          isOccupied ? `${draggedBlock.color} block-tactile` : 'bg-transparent'
                         }`}
                       >
                         {isOccupied && profile.colorblindMode && (
