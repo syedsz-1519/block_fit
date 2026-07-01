@@ -1,12 +1,21 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { applySecurityGuards } from '../../lib/apiSecurity';
+import { isRateLimited } from '../../lib/rateLimit';
 import { supabase } from '../../lib/supabase';
 import { generateDailyChallenge, validateSolution, getDailyBotScores } from '../../lib/dailyChallenge';
-import { applyCors } from '../../lib/cors';
+import { assertDate, assertUsername, assertMoves, assertTime } from '../../lib/validate';
 
-/** ISO date YYYY-MM-DD */
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+interface ScoreRow {
+  id: number;
+  username: string;
+  level_id: number;
+  stars: number;
+  moves: number;
+  time: number;
+  created_at: string;
+}
 
-function mapRow(row: Record<string, unknown>) {
+function mapRow(row: ScoreRow) {
   return {
     username: row.username,
     levelId: row.level_id,
@@ -17,53 +26,66 @@ function mapRow(row: Record<string, unknown>) {
   };
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  if (applyCors(req, res)) return;
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // ── Security + rate limit ──────────────────────────────────────────────────
+  if (applySecurityGuards(req, res)) return;
+  if (isRateLimited(req, res, 10)) return; // strict: 10 submissions/min per IP
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
-    res.status(405).json({ error: `Method ${req.method} not allowed` });
-    return;
+    return res.status(405).json({ error: `Method ${req.method} not allowed` });
   }
 
-  const { dateStr, username, placedBlocks, moves, time } = req.body ?? {};
+  // ── Validate inputs ────────────────────────────────────────────────────────
+  const body = req.body ?? {};
+  const dateStr = assertDate(body.dateStr, 'dateStr', res);
+  if (!dateStr) return;
+  const username = assertUsername(body.username, res);
+  if (!username) return;
+  const moves = assertMoves(body.moves, res);
+  if (moves === null) return;
+  const time = assertTime(body.time, res);
+  if (time === null) return;
 
-  // Validate date format before using it as DB filter or RNG seed
-  if (!dateStr || !DATE_RE.test(String(dateStr))) {
-    res.status(400).json({ error: 'Invalid or missing dateStr (expected YYYY-MM-DD)' });
-    return;
+  const { placedBlocks } = body;
+  if (!Array.isArray(placedBlocks) || placedBlocks.length === 0) {
+    return res.status(400).json({ error: 'placedBlocks must be a non-empty array' });
   }
-  if (!username || !placedBlocks || typeof moves !== 'number' || typeof time !== 'number') {
-    res.status(400).json({ error: 'Missing required submission fields' });
-    return;
+  if (placedBlocks.length > 50) {
+    return res.status(400).json({ error: 'Too many placed blocks' });
   }
 
   try {
+    // ── Validate solution server-side ────────────────────────────────────────
     const level = generateDailyChallenge(dateStr);
     const isValid = validateSolution(level, placedBlocks);
     if (!isValid) {
-      res.status(400).json({ success: false, error: 'Invalid block placement or incomplete grid' });
-      return;
+      return res.status(400).json({ success: false, error: 'Invalid block placement or incomplete grid' });
     }
 
+    // ── Calculate stars ──────────────────────────────────────────────────────
     let stars = 1;
     if (moves <= level.parMoves) stars++;
     if (time <= level.parTime) stars++;
 
-    const cleanUsername = String(username).substring(0, 20);
-
+    // ── Upsert best score ────────────────────────────────────────────────────
     const { data: existing, error: findErr } = await supabase
       .from('scores')
-      .select('*')
+      .select('id, stars, moves, time')
       .eq('mode', 'daily')
       .eq('challenge_date', dateStr)
-      .eq('username', cleanUsername)
+      .eq('username', username)
       .maybeSingle();
 
-    if (findErr) { res.status(500).json({ error: findErr.message }); return; }
+    if (findErr) {
+      console.error('[daily-submit] DB find error:', findErr.message);
+      return res.status(500).json({ error: 'Database error' });
+    }
 
     const isBetter = (a: { stars: number; moves: number; time: number }) =>
-      stars > a.stars || (stars === a.stars && moves < a.moves) || (stars === a.stars && moves === a.moves && time < a.time);
+      stars > a.stars ||
+      (stars === a.stars && moves < a.moves) ||
+      (stars === a.stars && moves === a.moves && time < a.time);
 
     if (existing) {
       if (isBetter(existing)) {
@@ -71,32 +93,67 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
           .from('scores')
           .update({ stars, moves, time, created_at: new Date().toISOString() })
           .eq('id', existing.id);
-        if (updErr) { res.status(500).json({ error: updErr.message }); return; }
+        if (updErr) {
+          console.error('[daily-submit] DB update error:', updErr.message);
+          return res.status(500).json({ error: 'Database error' });
+        }
       }
+      // else: keep existing better score — still return 200 with leaderboard
     } else {
       const { error: insErr } = await supabase
         .from('scores')
-        .insert({ username: cleanUsername, mode: 'daily', level_id: 9999, challenge_date: dateStr, stars, moves, time });
-      if (insErr) { res.status(500).json({ error: insErr.message }); return; }
+        .insert({
+          username,
+          mode: 'daily',
+          level_id: 9999,
+          challenge_date: dateStr,
+          stars,
+          moves,
+          time,
+        });
+      if (insErr) {
+        console.error('[daily-submit] DB insert error:', insErr.message);
+        return res.status(500).json({ error: 'Database error' });
+      }
     }
 
+    // ── Fetch updated leaderboard ────────────────────────────────────────────
     const { data: allScores, error: fetchErr } = await supabase
       .from('scores')
-      .select('*')
+      .select('username, level_id, stars, moves, time, created_at')
       .eq('mode', 'daily')
-      .eq('challenge_date', dateStr);
+      .eq('challenge_date', dateStr)
+      .order('stars', { ascending: false })
+      .order('moves', { ascending: true })
+      .order('time', { ascending: true })
+      .limit(50);
 
-    if (fetchErr) { res.status(500).json({ error: fetchErr.message }); return; }
+    if (fetchErr) {
+      console.error('[daily-submit] DB fetch error:', fetchErr.message);
+      return res.status(500).json({ error: 'Database error' });
+    }
 
-    const merged = [...(allScores ?? []).map(mapRow), ...getDailyBotScores(dateStr)].sort((a, b) => {
-      if ((b.stars as number) !== (a.stars as number)) return (b.stars as number) - (a.stars as number);
-      if ((a.moves as number) !== (b.moves as number)) return (a.moves as number) - (b.moves as number);
-      return (a.time as number) - (b.time as number);
+    const realScores = (allScores ?? []).map(mapRow);
+    const botScores = getDailyBotScores(dateStr);
+
+    // Merge — real players shadow bots with same username
+    const seen = new Set<string>();
+    const merged: ReturnType<typeof mapRow>[] = [];
+    for (const s of [...realScores, ...botScores]) {
+      if (!seen.has(s.username)) {
+        seen.add(s.username);
+        merged.push(s);
+      }
+    }
+    merged.sort((a, b) => {
+      if (b.stars !== a.stars) return b.stars - a.stars;
+      if (a.moves !== b.moves) return a.moves - b.moves;
+      return a.time - b.time;
     });
 
-    res.status(200).json({ success: true, stars, leaderboard: merged });
+    return res.status(200).json({ success: true, stars, leaderboard: merged });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error validating challenge' });
+    console.error('[daily-submit] Unexpected error:', err);
+    return res.status(500).json({ error: 'Server error validating challenge' });
   }
 }
