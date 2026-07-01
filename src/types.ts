@@ -13,6 +13,7 @@ export interface BlockShape {
 export interface PlacedBlock {
   blockId: string;
   shapeId: string;
+  name?: string; // display name — optional for backwards compat
   color: string;
   cells: number[][]; // actual grid coordinates
   x: number; // grid column anchor

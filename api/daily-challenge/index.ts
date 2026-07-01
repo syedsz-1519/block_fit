@@ -1,8 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from '../../lib/supabase';
 import { generateDailyChallenge, getDailyBotScores } from '../../lib/dailyChallenge';
+import { applyCors } from '../../lib/cors';
 
-function mapRow(row: any) {
+/** ISO date YYYY-MM-DD */
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function mapRow(row: Record<string, unknown>) {
   return {
     username: row.username,
     levelId: row.level_id,
@@ -18,14 +22,18 @@ function todayStr() {
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  if (applyCors(req, res)) return;
+
   if (req.method !== 'GET') {
     res.setHeader('Allow', ['GET']);
-    return res.status(405).json({ error: `Method ${req.method} not allowed` });
+    res.status(405).json({ error: `Method ${req.method} not allowed` });
+    return;
   }
 
   const dateRaw = req.query.date;
-  const date = typeof dateRaw === 'string' && dateRaw.length > 0 ? dateRaw : todayStr();
+  // Validate format to prevent arbitrary strings being fed into the RNG seed
+  const date = typeof dateRaw === 'string' && DATE_RE.test(dateRaw) ? dateRaw : todayStr();
 
   try {
     const level = generateDailyChallenge(date);
@@ -36,20 +44,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('mode', 'daily')
       .eq('challenge_date', date);
 
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) { res.status(500).json({ error: error.message }); return; }
 
     const realScores = (data ?? []).map(mapRow);
     const botScores = getDailyBotScores(date);
 
     const merged = [...realScores, ...botScores].sort((a, b) => {
-      if (b.stars !== a.stars) return b.stars - a.stars;
-      if (a.moves !== b.moves) return a.moves - b.moves;
-      return a.time - b.time;
+      if ((b.stars as number) !== (a.stars as number)) return (b.stars as number) - (a.stars as number);
+      if ((a.moves as number) !== (b.moves as number)) return (a.moves as number) - (b.moves as number);
+      return (a.time as number) - (b.time as number);
     });
 
-    return res.status(200).json({ level, leaderboard: merged });
+    res.status(200).json({ level, leaderboard: merged });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Failed to generate daily challenge' });
+    res.status(500).json({ error: 'Failed to generate daily challenge' });
   }
 }

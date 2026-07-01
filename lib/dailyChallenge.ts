@@ -34,6 +34,15 @@ export interface LeaderboardEntry {
   timestamp: string;
 }
 
+/**
+ * Minimal shape expected from the client when validating a submitted solution.
+ * Only the fields actually checked server-side need to be present.
+ */
+export interface PlacedBlockSubmission {
+  blockId: string;
+  cells: [number, number][];
+}
+
 export function seededRandom(seedStr: string) {
   let h = 1779033703 ^ seedStr.length;
   for (let i = 0; i < seedStr.length; i++) {
@@ -230,12 +239,12 @@ export function getDailyBotScores(dateStr: string): LeaderboardEntry[] {
   });
 }
 
-export function validateSolution(level: DailyChallengeLevel, placedBlocks: any[]): boolean {
+export function validateSolution(level: DailyChallengeLevel, placedBlocks: PlacedBlockSubmission[]): boolean {
   if (placedBlocks.length !== level.availableBlocks.length) {
     return false;
   }
 
-  const occupied = Array.from({ length: level.gridHeight }, () => Array(level.gridWidth).fill(false));
+  const occupied = Array.from({ length: level.gridHeight }, () => Array<boolean>(level.gridWidth).fill(false));
 
   for (const [bx, by] of level.blockedCells) {
     if (bx >= 0 && bx < level.gridWidth && by >= 0 && by < level.gridHeight) {
@@ -246,7 +255,7 @@ export function validateSolution(level: DailyChallengeLevel, placedBlocks: any[]
   for (const pb of placedBlocks) {
     const match = pb.blockId.match(/block_(\d+)/);
     if (!match) return false;
-    const blockIndex = parseInt(match[1]);
+    const blockIndex = parseInt(match[1], 10);
     if (isNaN(blockIndex) || blockIndex < 0 || blockIndex >= level.availableBlocks.length) {
       return false;
     }
@@ -263,9 +272,9 @@ export function validateSolution(level: DailyChallengeLevel, placedBlocks: any[]
       occupied[cy][cx] = true;
     }
 
-    const minX = Math.min(...pb.cells.map((c: any) => c[0]));
-    const minY = Math.min(...pb.cells.map((c: any) => c[1]));
-    const relativePlaced = pb.cells.map(([cx, cy]: any) => [cx - minX, cy - minY]);
+    const minX = Math.min(...pb.cells.map((c) => c[0]));
+    const minY = Math.min(...pb.cells.map((c) => c[1]));
+    const relativePlaced = pb.cells.map(([cx, cy]) => [cx - minX, cy - minY]);
 
     let isValidTransformation = false;
     for (let rot = 0; rot < 4; rot++) {
@@ -274,7 +283,7 @@ export function validateSolution(level: DailyChallengeLevel, placedBlocks: any[]
         trans = mirrorOffsets(trans, mir);
 
         if (trans.length === relativePlaced.length) {
-          const matchCount = trans.filter(([tx, ty]) => relativePlaced.some(([px, py]: any) => px === tx && py === ty)).length;
+          const matchCount = trans.filter(([tx, ty]) => relativePlaced.some(([px, py]) => px === tx && py === ty)).length;
           if (matchCount === trans.length) {
             isValidTransformation = true;
             break;

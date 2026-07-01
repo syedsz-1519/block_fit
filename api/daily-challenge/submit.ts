@@ -1,8 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from '../../lib/supabase';
 import { generateDailyChallenge, validateSolution, getDailyBotScores } from '../../lib/dailyChallenge';
+import { applyCors } from '../../lib/cors';
 
-function mapRow(row: any) {
+/** ISO date YYYY-MM-DD */
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function mapRow(row: Record<string, unknown>) {
   return {
     username: row.username,
     levelId: row.level_id,
@@ -13,22 +17,33 @@ function mapRow(row: any) {
   };
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  if (applyCors(req, res)) return;
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
-    return res.status(405).json({ error: `Method ${req.method} not allowed` });
+    res.status(405).json({ error: `Method ${req.method} not allowed` });
+    return;
   }
 
   const { dateStr, username, placedBlocks, moves, time } = req.body ?? {};
-  if (!dateStr || !username || !placedBlocks || typeof moves !== 'number' || typeof time !== 'number') {
-    return res.status(400).json({ error: 'Missing required submission fields' });
+
+  // Validate date format before using it as DB filter or RNG seed
+  if (!dateStr || !DATE_RE.test(String(dateStr))) {
+    res.status(400).json({ error: 'Invalid or missing dateStr (expected YYYY-MM-DD)' });
+    return;
+  }
+  if (!username || !placedBlocks || typeof moves !== 'number' || typeof time !== 'number') {
+    res.status(400).json({ error: 'Missing required submission fields' });
+    return;
   }
 
   try {
     const level = generateDailyChallenge(dateStr);
     const isValid = validateSolution(level, placedBlocks);
     if (!isValid) {
-      return res.status(400).json({ success: false, error: 'Invalid block placement or incomplete grid' });
+      res.status(400).json({ success: false, error: 'Invalid block placement or incomplete grid' });
+      return;
     }
 
     let stars = 1;
@@ -45,7 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('username', cleanUsername)
       .maybeSingle();
 
-    if (findErr) return res.status(500).json({ error: findErr.message });
+    if (findErr) { res.status(500).json({ error: findErr.message }); return; }
 
     const isBetter = (a: { stars: number; moves: number; time: number }) =>
       stars > a.stars || (stars === a.stars && moves < a.moves) || (stars === a.stars && moves === a.moves && time < a.time);
@@ -56,13 +71,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .from('scores')
           .update({ stars, moves, time, created_at: new Date().toISOString() })
           .eq('id', existing.id);
-        if (updErr) return res.status(500).json({ error: updErr.message });
+        if (updErr) { res.status(500).json({ error: updErr.message }); return; }
       }
     } else {
       const { error: insErr } = await supabase
         .from('scores')
         .insert({ username: cleanUsername, mode: 'daily', level_id: 9999, challenge_date: dateStr, stars, moves, time });
-      if (insErr) return res.status(500).json({ error: insErr.message });
+      if (insErr) { res.status(500).json({ error: insErr.message }); return; }
     }
 
     const { data: allScores, error: fetchErr } = await supabase
@@ -71,17 +86,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('mode', 'daily')
       .eq('challenge_date', dateStr);
 
-    if (fetchErr) return res.status(500).json({ error: fetchErr.message });
+    if (fetchErr) { res.status(500).json({ error: fetchErr.message }); return; }
 
     const merged = [...(allScores ?? []).map(mapRow), ...getDailyBotScores(dateStr)].sort((a, b) => {
-      if (b.stars !== a.stars) return b.stars - a.stars;
-      if (a.moves !== b.moves) return a.moves - b.moves;
-      return a.time - b.time;
+      if ((b.stars as number) !== (a.stars as number)) return (b.stars as number) - (a.stars as number);
+      if ((a.moves as number) !== (b.moves as number)) return (a.moves as number) - (b.moves as number);
+      return (a.time as number) - (b.time as number);
     });
 
-    return res.status(200).json({ success: true, stars, leaderboard: merged });
+    res.status(200).json({ success: true, stars, leaderboard: merged });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Server error validating challenge' });
+    res.status(500).json({ error: 'Server error validating challenge' });
   }
 }
