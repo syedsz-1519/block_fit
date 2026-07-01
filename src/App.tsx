@@ -99,7 +99,12 @@ export default function App() {
           hapticEnabled: parsed.hapticEnabled ?? true,
           difficultySetting: parsed.difficultySetting || 'Medium',
           username: parsed.username || `Player_${Math.floor(1000 + Math.random() * 9000)}`,
-          syncCode: parsed.syncCode
+          syncCode: parsed.syncCode,
+          userId: parsed.userId || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'usr_' + Math.random().toString(36).substring(2, 15)),
+          guestCreatedAt: parsed.guestCreatedAt || new Date().toISOString(),
+          isLoggedIn: parsed.isLoggedIn ?? false,
+          userEmail: parsed.userEmail,
+          restrictedMode: parsed.restrictedMode ?? false
         };
       }
     } catch (e) {
@@ -120,7 +125,11 @@ export default function App() {
       colorblindMode: false,
       hapticEnabled: true,
       difficultySetting: 'Medium',
-      username: `Player_${Math.floor(1000 + Math.random() * 9000)}`
+      username: `Player_${Math.floor(1000 + Math.random() * 9000)}`,
+      userId: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'usr_' + Math.random().toString(36).substring(2, 15),
+      guestCreatedAt: new Date().toISOString(),
+      isLoggedIn: false,
+      restrictedMode: false
     };
   });
 
@@ -355,6 +364,36 @@ export default function App() {
   const [undosRemaining, setUndosRemaining] = useState(3);
   const [isUndoAdOpen, setIsUndoAdOpen] = useState(false);
 
+  // --- OAuth Redirect Session Parser & Startup Guards ---
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const email = params.get('email');
+    const userId = params.get('userId');
+    const username = params.get('username');
+    const authError = params.get('auth_error');
+
+    if (token && userId && email) {
+      setProfile(prev => ({
+        ...prev,
+        userId,
+        username: username || prev.username,
+        isLoggedIn: true,
+        userEmail: email,
+        authToken: token,
+        restrictedMode: false
+      }));
+      setTimeout(() => {
+        sound.playWin();
+      }, 500);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (authError) {
+      console.error('Authentication Error:', authError);
+      alert(`Authentication failed: ${authError}`);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   // Initialize sounds mute state
   useEffect(() => {
     sound.setMuted(!profile.soundEnabled);
@@ -470,8 +509,17 @@ export default function App() {
             clearInterval(progressInterval);
             clearInterval(tipInterval);
             setTimeout(() => {
-              setCurrentScreen('main_menu');
-            }, 600);
+               const created = new Date(profile.guestCreatedAt || new Date().toISOString()).getTime();
+               const now = Date.now();
+               const sevenDays = 7 * 24 * 60 * 60 * 1000;
+               const isExpired = (now - created) > sevenDays;
+               
+               if (isExpired && !profile.isLoggedIn && !profile.restrictedMode) {
+                 setCurrentScreen('auth');
+               } else {
+                 setCurrentScreen('main_menu');
+               }
+             }, 600);
             return 100;
           }
           // Increments of random speed
@@ -704,14 +752,50 @@ export default function App() {
     return adjusted;
   };
 
+  const centerLevelOn8x8 = (level: LevelConfig): LevelConfig => {
+    if (level.gridWidth === 8 && level.gridHeight === 8) return level;
+    
+    const activeWidth = level.gridWidth;
+    const activeHeight = level.gridHeight;
+    const offsetX = Math.floor((8 - activeWidth) / 2);
+    const offsetY = Math.floor((8 - activeHeight) / 2);
+    
+    const adjusted: LevelConfig = JSON.parse(JSON.stringify(level));
+    adjusted.gridWidth = 8;
+    adjusted.gridHeight = 8;
+    
+    const shiftedBlocked = level.blockedCells.map(([bx, by]) => [bx + offsetX, by + offsetY]);
+    
+    const borderBlocked: number[][] = [];
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        if (x < offsetX || x >= offsetX + activeWidth || y < offsetY || y >= offsetY + activeHeight) {
+          borderBlocked.push([x, y]);
+        }
+      }
+    }
+    
+    adjusted.blockedCells = [...borderBlocked, ...shiftedBlocked];
+    
+    if (level.hintSequence) {
+      adjusted.hintSequence = level.hintSequence.map(h => ({
+        ...h,
+        x: h.x + offsetX,
+        y: h.y + offsetY
+      }));
+    }
+    
+    return adjusted;
+  };
+
   // --- Gameplay System Setup ---
   const startLevel = (level: LevelConfig, isSpeedrun: boolean = false) => {
     setIsSudokuMode(false);
     setIsDailyChallenge(false);
     
-    // Look up original level by ID from PRESET_LEVELS first to avoid double-modifying
     const originalLevel = PRESET_LEVELS.find(l => l.id === level.id) || level;
-    const adjustedLevel = getAdjustedLevel(originalLevel, profile.difficultySetting || 'Medium');
+    let adjustedLevel = getAdjustedLevel(originalLevel, profile.difficultySetting || 'Medium');
+    adjustedLevel = centerLevelOn8x8(adjustedLevel);
 
     setActiveLevel(adjustedLevel);
     setMoveCount(0);
@@ -1186,6 +1270,7 @@ export default function App() {
           body: JSON.stringify({
             dateStr: dailyDate,
             username: profile.username,
+            userId: profile.userId,
             placedBlocks: blocks.map(pb => ({
               blockId: pb.blockId,
               cells: pb.cells
@@ -1228,6 +1313,7 @@ export default function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             username: profile.username,
+            userId: profile.userId,
             levelId: activeLevel.id,
             stars: isSpeedrunMode ? 3 : stars, // Completing speedrun is always 3 stars of honor!
             moves: moveCount + 1,

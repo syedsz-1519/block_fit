@@ -8,6 +8,7 @@
 create table if not exists scores (
   id             bigserial primary key,
   username       text        not null check (char_length(username) <= 20),
+  user_id        text,                                      -- UUID/identifier of guest/authed user
   mode           text        not null check (mode in ('campaign', 'speedrun', 'daily')),
   level_id       integer     not null,
   stars          integer     not null check (stars between 1 and 3),

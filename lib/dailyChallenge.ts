@@ -81,31 +81,53 @@ export function generateDailyChallenge(dateStr: string): DailyChallengeLevel {
   const rng = seededRandom(dateStr);
   const sizeChoice = rng();
 
-  let gridWidth = 4;
-  let gridHeight = 4;
+  let activeWidth = 4;
+  let activeHeight = 4;
   let difficulty: DailyChallengeLevel['difficulty'] = 'Medium';
 
   if (sizeChoice < 0.33) {
-    gridWidth = 4;
-    gridHeight = 4;
+    activeWidth = 4;
+    activeHeight = 4;
     difficulty = 'Easy';
   } else if (sizeChoice < 0.66) {
-    gridWidth = 5;
-    gridHeight = 5;
+    activeWidth = 5;
+    activeHeight = 5;
     difficulty = 'Medium';
   } else {
-    gridWidth = 6;
-    gridHeight = 5;
+    activeWidth = 6;
+    activeHeight = 6;
     difficulty = 'Hard';
   }
 
-  const blockedCount = Math.floor(rng() * 3);
-  const blockedCells: number[][] = [];
-  const assigned = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(false));
+  const gridWidth = 8;
+  const gridHeight = 8;
 
+  const offsetX = Math.floor((gridWidth - activeWidth) / 2);
+  const offsetY = Math.floor((gridHeight - activeHeight) / 2);
+
+  const blockedCells: number[][] = [];
+  const assigned = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(true)); // Block everything initially
+
+  // Unblock active playing area
+  for (let y = offsetY; y < offsetY + activeHeight; y++) {
+    for (let x = offsetX; x < offsetX + activeWidth; x++) {
+      assigned[y][x] = false;
+    }
+  }
+
+  // Populate blockedCells for outer layout boundary
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if (x < offsetX || x >= offsetX + activeWidth || y < offsetY || y >= offsetY + activeHeight) {
+        blockedCells.push([x, y]);
+      }
+    }
+  }
+
+  const blockedCount = Math.floor(rng() * 3);
   for (let i = 0; i < blockedCount; i++) {
-    const rx = Math.floor(rng() * gridWidth);
-    const ry = Math.floor(rng() * gridHeight);
+    const rx = offsetX + Math.floor(rng() * activeWidth);
+    const ry = offsetY + Math.floor(rng() * activeHeight);
     if (!assigned[ry][rx]) {
       assigned[ry][rx] = true;
       blockedCells.push([rx, ry]);

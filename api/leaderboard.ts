@@ -36,8 +36,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     }
 
     if (req.method === 'POST') {
-      const { username, levelId, stars, moves, time } = req.body ?? {};
-      if (!username || typeof levelId !== 'number' || typeof stars !== 'number' || typeof moves !== 'number' || typeof time !== 'number') {
+      const { username, userId, levelId, stars, moves, time } = req.body ?? {};
+      if (!username || !userId || typeof levelId !== 'number' || typeof stars !== 'number' || typeof moves !== 'number' || typeof time !== 'number') {
         res.status(400).json({ error: 'Missing required score fields' });
         return;
       }
@@ -46,6 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         .from('scores')
         .insert({
           username: String(username).substring(0, 20),
+          user_id: String(userId).substring(0, 50),
           mode: 'campaign',
           level_id: levelId,
           stars,

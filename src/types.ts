@@ -50,6 +50,7 @@ export interface PlayerProfile {
   hapticEnabled?: boolean;
   difficultySetting?: 'Easy' | 'Medium' | 'Hard';
   syncCode?: string;
+  userId?: string;
   username: string;
 }
 

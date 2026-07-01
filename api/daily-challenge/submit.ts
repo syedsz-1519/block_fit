@@ -42,6 +42,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!dateStr) return;
   const username = assertUsername(body.username, res);
   if (!username) return;
+  const userId = typeof body.userId === 'string' ? body.userId.trim().substring(0, 50) : null;
+  if (!userId) {
+    res.status(400).json({ error: 'userId must be a non-empty string' });
+    return;
+  }
   const moves = assertMoves(body.moves, res);
   if (moves === null) return;
   const time = assertTime(body.time, res);
@@ -74,7 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .select('id, stars, moves, time')
       .eq('mode', 'daily')
       .eq('challenge_date', dateStr)
-      .eq('username', username)
+      .eq('user_id', userId)
       .maybeSingle();
 
     if (findErr) {
@@ -88,22 +93,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       (stars === a.stars && moves === a.moves && time < a.time);
 
     if (existing) {
+      const updates: Record<string, any> = { username };
       if (isBetter(existing)) {
-        const { error: updErr } = await supabase
-          .from('scores')
-          .update({ stars, moves, time, created_at: new Date().toISOString() })
-          .eq('id', existing.id);
-        if (updErr) {
-          console.error('[daily-submit] DB update error:', updErr.message);
-          return res.status(500).json({ error: 'Database error' });
-        }
+        updates.stars = stars;
+        updates.moves = moves;
+        updates.time = time;
+        updates.created_at = new Date().toISOString();
       }
-      // else: keep existing better score — still return 200 with leaderboard
+      const { error: updErr } = await supabase
+        .from('scores')
+        .update(updates)
+        .eq('id', existing.id);
+      if (updErr) {
+        console.error('[daily-submit] DB update error:', updErr.message);
+        return res.status(500).json({ error: 'Database error' });
+      }
     } else {
       const { error: insErr } = await supabase
         .from('scores')
         .insert({
           username,
+          user_id: userId,
           mode: 'daily',
           level_id: 9999,
           challenge_date: dateStr,

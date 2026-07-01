@@ -36,12 +36,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     }
 
     if (req.method === 'POST') {
-      const { username, levelId, stars, moves, time } = req.body ?? {};
-      if (!username || typeof levelId !== 'number' || typeof stars !== 'number' || typeof moves !== 'number' || typeof time !== 'number') {
+      const { username, userId, levelId, stars, moves, time } = req.body ?? {};
+      if (!username || !userId || typeof levelId !== 'number' || typeof stars !== 'number' || typeof moves !== 'number' || typeof time !== 'number') {
         res.status(400).json({ error: 'Missing required score fields' });
         return;
       }
       const cleanUsername = String(username).substring(0, 20);
+      const cleanUserId = String(userId).substring(0, 50);
 
       // Keep only the user's best speedrun score for this level.
       const { data: existing, error: findErr } = await supabase
@@ -49,30 +50,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         .select('*')
         .eq('mode', 'speedrun')
         .eq('level_id', levelId)
-        .eq('username', cleanUsername)
+        .eq('user_id', cleanUserId)
         .maybeSingle();
 
       if (findErr) { res.status(500).json({ error: findErr.message }); return; }
 
       if (existing) {
+        const updates: Record<string, any> = { username: cleanUsername };
+        let isImproved = false;
         if (time < existing.time) {
-          const { data, error } = await supabase
-            .from('scores')
-            .update({ stars, moves, time, created_at: new Date().toISOString() })
-            .eq('id', existing.id)
-            .select()
-            .single();
-          if (error) { res.status(500).json({ error: error.message }); return; }
-          res.status(201).json({ success: true, entry: mapRow(data) });
-          return;
+          updates.stars = stars;
+          updates.moves = moves;
+          updates.time = time;
+          updates.created_at = new Date().toISOString();
+          isImproved = true;
         }
-        res.status(201).json({ success: true, entry: mapRow(existing) });
+
+        const { data, error } = await supabase
+          .from('scores')
+          .update(updates)
+          .eq('id', existing.id)
+          .select()
+          .single();
+        if (error) { res.status(500).json({ error: error.message }); return; }
+        res.status(201).json({ success: true, entry: mapRow(data) });
         return;
       }
 
       const { data, error } = await supabase
         .from('scores')
-        .insert({ username: cleanUsername, mode: 'speedrun', level_id: levelId, stars, moves, time })
+        .insert({ username: cleanUsername, user_id: cleanUserId, mode: 'speedrun', level_id: levelId, stars, moves, time })
         .select()
         .single();
 
