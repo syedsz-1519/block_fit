@@ -12,9 +12,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-// In production the frontend is served from the same Vercel domain, so
-// same-origin requests don't need CORS at all. For local `vercel dev` the
-// Vite dev server runs on a different port so we also allow localhost origins.
 const ALLOWED_ORIGINS = new Set([
   process.env.APP_URL ?? '',          // e.g. https://block-fit.vercel.app
   'http://localhost:3000',
@@ -22,15 +19,35 @@ const ALLOWED_ORIGINS = new Set([
   'http://127.0.0.1:5173',
 ]);
 
+const isLocalNetworkOrigin = (origin: string): boolean => {
+  try {
+    const url = new URL(origin);
+    const hostname = url.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+    if (hostname.startsWith('192.168.')) return true;
+    if (hostname.startsWith('10.')) return true;
+    if (hostname.startsWith('172.')) {
+      const parts = hostname.split('.');
+      if (parts.length >= 2) {
+        const secondPart = parseInt(parts[1], 10);
+        return secondPart >= 16 && secondPart <= 31;
+      }
+    }
+  } catch (e) {
+    // Ignore invalid origins
+  }
+  return false;
+};
+
 export function setCorsHeaders(req: VercelRequest, res: VercelResponse): boolean {
   const origin = req.headers['origin'] ?? '';
 
-  if (ALLOWED_ORIGINS.has(origin)) {
+  if (ALLOWED_ORIGINS.has(origin) || isLocalNetworkOrigin(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Max-Age', '86400'); // 24 h preflight cache
 
   // Handle OPTIONS preflight immediately
