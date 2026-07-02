@@ -350,6 +350,7 @@ export default function App() {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [authErrorMessage, setAuthErrorMessage] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+  const [isTrialExpired, setIsTrialExpired] = useState(false);
 
   // --- HTML App Url (from process env / fallback) ---
   const appUrl = "https://ai.studio/build";
@@ -554,6 +555,7 @@ export default function App() {
                const now = Date.now();
                const sevenDays = 7 * 24 * 60 * 60 * 1000;
                const isExpired = (now - created) > sevenDays;
+               setIsTrialExpired(isExpired);
                
                if (isExpired && !profile.isLoggedIn && !profile.restrictedMode) {
                  setCurrentScreen('auth');
@@ -2280,20 +2282,26 @@ export default function App() {
               <span>Continue with Google</span>
             </button>
 
-            {/* Play as Guest Option */}
-            <div className="text-center mt-5">
-              <button
-                type="button"
-                onClick={() => {
-                  sound.playClick();
-                  setProfile(prev => ({ ...prev, restrictedMode: true }));
-                  setCurrentScreen('main_menu');
-                }}
-                className="text-xs font-bold opacity-60 hover:opacity-100 transition-opacity hover:underline"
-              >
-                Play as Guest (Restricted Progress)
-              </button>
-            </div>
+            {/* Play as Guest Option (Only if trial has not expired) */}
+            {!isTrialExpired ? (
+              <div className="text-center mt-5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setProfile(prev => ({ ...prev, restrictedMode: true }));
+                    setCurrentScreen('main_menu');
+                  }}
+                  className="text-xs font-bold opacity-60 hover:opacity-100 transition-opacity hover:underline"
+                >
+                  Play as Guest (Restricted Progress)
+                </button>
+              </div>
+            ) : (
+              <div className="text-center mt-5 text-[10px] text-red-500 font-extrabold tracking-wide">
+                🚫 Guest trial has expired. Please sign in or register to continue.
+              </div>
+            )}
 
           </div>
         </motion.div>
