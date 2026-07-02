@@ -1891,7 +1891,11 @@ export default function App() {
 
   // --- Unlock Premium Mode Simulation ---
   const handleUnlockPlus = () => {
-    setProfile(prev => ({ ...prev, isSubscribed: true, hintsRemaining: 99 }));
+    const updated = { ...profile, isSubscribed: true, hintsRemaining: 99 };
+    setProfile(updated);
+    if (profile.isLoggedIn) {
+      saveProfileToCloud(updated);
+    }
     setCurrentScreen('main_menu');
     sound.playWin();
   };
@@ -2430,6 +2434,11 @@ export default function App() {
                           <button
                             onClick={() => {
                               sound.playClick();
+                              if (!profile.isSubscribed) {
+                                alert("Replaying completed Daily Challenges from the archive is a premium feature! Subscribe to Block Fit Plus to unlock unlimited archive access.");
+                                setCurrentScreen('subscription');
+                                return;
+                              }
                               startDailyChallenge(dateStr);
                             }}
                             className="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5"
@@ -4604,8 +4613,16 @@ export default function App() {
                     <select 
                       value={profile.theme}
                       onChange={(e) => {
+                        const selectedTheme = e.target.value;
+                        if (!profile.isSubscribed && (selectedTheme === 'neon' || selectedTheme === 'sunset' || selectedTheme === 'retro')) {
+                          sound.playClick();
+                          alert(`${selectedTheme.toUpperCase()} theme is a premium feature! Subscribe to Block Fit Plus to unlock all premium visual styles.`);
+                          setIsSettingsOpen(false);
+                          setCurrentScreen('subscription');
+                          return;
+                        }
                         sound.playClick();
-                        setProfile(prev => ({ ...prev, theme: e.target.value as any }));
+                        setProfile(prev => ({ ...prev, theme: selectedTheme as any }));
                       }}
                       className="bg-gray-100 dark:bg-gray-900 text-xs font-bold border-transparent rounded-xl px-3 py-1.5 text-primary dark:text-white focus:outline-none"
                     >
