@@ -11,7 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
   // Supabase Auth exchanges authorization code for a session
   const code = req.query.code;
-  const appUrl = process.env.APP_URL || 'http://localhost:5173';
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
 
   if (!code) {
     // If no code is present, check if there was an error in redirect

@@ -15,7 +15,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   try {
-    const appUrl = process.env.APP_URL || 'http://localhost:5173';
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
     const redirectUrl = `${appUrl}/api/auth/callback`;
 
     const { data, error } = await supabase.auth.signInWithOAuth({

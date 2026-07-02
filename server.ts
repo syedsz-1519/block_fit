@@ -5,6 +5,8 @@ import signupHandler from "./api/auth/signup";
 import loginHandler from "./api/auth/login";
 import saveProfileHandler from "./api/auth/save-profile";
 import loadProfileHandler from "./api/auth/load-profile";
+import googleHandler from "./api/auth/google";
+import callbackHandler from "./api/auth/callback";
 
 interface LeaderboardEntry {
   username: string;
@@ -580,6 +582,8 @@ async function startServer() {
   app.post("/api/auth/login", (req, res) => loginHandler(req as any, res as any));
   app.post("/api/auth/save-profile", (req, res) => saveProfileHandler(req as any, res as any));
   app.get("/api/auth/load-profile", (req, res) => loadProfileHandler(req as any, res as any));
+  app.get("/api/auth/google", (req, res) => googleHandler(req as any, res as any));
+  app.get("/api/auth/callback", (req, res) => callbackHandler(req as any, res as any));
 
   // Vite middleware for assets / hot reloading
   if (process.env.NODE_ENV !== "production") {

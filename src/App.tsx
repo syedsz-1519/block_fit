@@ -386,18 +386,47 @@ export default function App() {
     const authError = params.get('auth_error');
 
     if (token && userId && email) {
-      setProfile(prev => ({
-        ...prev,
-        userId,
-        username: username || prev.username,
-        isLoggedIn: true,
-        userEmail: email,
-        authToken: token,
-        restrictedMode: false
-      }));
-      setTimeout(() => {
+      const loadProfileOnOAuth = async () => {
+        try {
+          const res = await fetch(`/api/auth/load-profile?userId=${encodeURIComponent(userId)}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.profile) {
+              setProfile({
+                ...data.profile,
+                userId,
+                username: username || data.profile.username || 'Player',
+                isLoggedIn: true,
+                userEmail: email,
+                authToken: token,
+                restrictedMode: false
+              });
+              sound.playWin();
+              return;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load profile on OAuth callback:", e);
+        }
+
+        // Fallback if no cloud profile exists yet
+        setProfile(prev => ({
+          ...prev,
+          userId,
+          username: username || prev.username,
+          isLoggedIn: true,
+          userEmail: email,
+          authToken: token,
+          restrictedMode: false
+        }));
         sound.playWin();
-      }, 500);
+      };
+
+      loadProfileOnOAuth();
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (authError) {
       console.error('Authentication Error:', authError);
