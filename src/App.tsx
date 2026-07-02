@@ -1736,10 +1736,8 @@ export default function App() {
 
         setSudokuGrid(nextGrid);
         
-        // Remove from tray if came from tray
-        if (draggedBlock.origin === 'tray') {
-          setTrayBlocks(prev => prev.filter(tb => tb.id !== draggedBlock.id));
-        }
+        // Remove from tray because it is now placed
+        setTrayBlocks(prev => prev.filter(tb => tb.id !== draggedBlock.id));
 
         setMoveCount(prev => prev + 1);
         sound.playPlace();
@@ -1750,10 +1748,8 @@ export default function App() {
           handleWinSudoku();
         }
       } else {
-        // Remove from tray if came from tray
-        if (draggedBlock.origin === 'tray') {
-          setTrayBlocks(prev => prev.filter(tb => tb.id !== draggedBlock.id));
-        }
+        // Remove from tray because it is now placed
+        setTrayBlocks(prev => prev.filter(tb => tb.id !== draggedBlock.id));
 
         setMoveCount(prev => prev + 1);
         sound.playPlace();
@@ -1764,7 +1760,12 @@ export default function App() {
       }
     } else {
       // Invalid release. Return back
-      sound.playInvalid();
+      const dx = dragPosition.x - dragStartPos.current.x;
+      const dy = dragPosition.y - dragStartPos.current.y;
+      const hasMoved = Math.sqrt(dx * dx + dy * dy) > 10;
+      if (hasMoved) {
+        sound.playInvalid();
+      }
 
       if (draggedBlock.origin === 'grid') {
         // Return grid block back to tray
@@ -2041,7 +2042,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${THEME_CLASSES[profile.theme]}`}>
+    <div className={`min-h-[100dvh] flex flex-col font-sans transition-colors duration-300 ${THEME_CLASSES[profile.theme]}`}>
       <AnimatePresence mode="wait">
         
         {/* 1. SPLASH SCREEN */}
@@ -3121,7 +3122,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="flex-grow flex flex-col h-screen max-h-screen overflow-hidden"
+            className="flex-grow flex flex-col h-[100dvh] max-h-[100dvh] overflow-hidden"
           >
             {/* Header */}
             <header className="flex justify-between items-center w-full px-6 h-16 bg-white/40 dark:bg-black/20 backdrop-blur-md z-10 border-b border-gray-150/10 flex-shrink-0">
@@ -3722,7 +3723,7 @@ export default function App() {
                       <div 
                         key={`${r}-${c}`}
                         className={`relative w-full aspect-square rounded-xl transition-all duration-150 flex items-center justify-center ${getCellBgClass(state, colorClass)} ${
-                          state === 'filled' ? 'block-tactile' : ''
+                          state === 'filled' ? 'block-tactile cursor-grab active:cursor-grabbing' : ''
                         } ${
                           isGhostCoordinate 
                             ? isGhostValid 
@@ -3732,6 +3733,22 @@ export default function App() {
                         } ${
                           isHintCoordinate && !placingInfo ? 'ring-4 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 shadow-md animate-pulse z-10' : ''
                         }`}
+                        style={{ touchAction: 'none' }}
+                        onPointerDown={(e) => {
+                          if (placingInfo) {
+                            const originalBlock = activeLevel.availableBlocks.find(ab => ab.id === placingInfo.blockId) || {
+                              id: placingInfo.blockId,
+                              cells: placingInfo.originalCells || placingInfo.cells,
+                              color: placingInfo.color
+                            };
+                            handleLiftPlacedBlock(placingInfo);
+                            handlePointerDown(e, {
+                              ...originalBlock,
+                              rotations: placingInfo.rotations,
+                              mirrored: placingInfo.mirrored
+                            }, 'grid');
+                          }
+                        }}
                         onClick={() => {
                           if (placingInfo) {
                             handleLiftPlacedBlock(placingInfo);
@@ -3865,6 +3882,7 @@ export default function App() {
                   <div 
                     key={block.id}
                     className="relative cursor-grab active:cursor-grabbing hover:scale-105 transition-transform flex-shrink-0 bg-white dark:bg-gray-900 p-3 rounded-2xl border border-gray-200/40 dark:border-gray-800/40 shadow-md"
+                    style={{ touchAction: 'none' }}
                     onPointerDown={(e) => {
                       const blockId = block.id;
                       if (blockPressTimers.current[blockId]) {
