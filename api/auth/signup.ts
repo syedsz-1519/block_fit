@@ -37,10 +37,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       return;
     }
 
+    const user = data.user;
+
+    // Create an initial default profile in the profiles table
+    const defaultProfile = {
+      levelProgress: {},
+      currentLevel: 1,
+      hintsRemaining: 3,
+      isSubscribed: false,
+      theme: 'light',
+      soundEnabled: true,
+      musicEnabled: true,
+      hapticEnabled: true,
+      colorblindMode: false,
+      soundscape: 'zen',
+      username: cleanUsername,
+      userId: user.id,
+      guestCreatedAt: new Date().toISOString(),
+      isLoggedIn: true,
+      userEmail: user.email,
+      restrictedMode: false,
+      authToken: ''
+    };
+
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        user_id: user.id,
+        email: user.email,
+        username: cleanUsername,
+        profile_data: defaultProfile,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+
+    if (profileError) {
+      console.error('[auth/signup] Error inserting default profile row:', profileError);
+    }
+
     res.status(201).json({
       success: true,
-      userId: data.user.id,
-      email: data.user.email,
+      userId: user.id,
+      email: user.email,
       username: cleanUsername,
     });
   } catch (err) {
