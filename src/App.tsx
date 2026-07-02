@@ -697,7 +697,10 @@ export default function App() {
     try {
       await fetch('/api/auth/save-profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${profToSave.authToken || profile.authToken}`
+        },
         body: JSON.stringify({
           userId: profToSave.userId,
           email: profToSave.userEmail,

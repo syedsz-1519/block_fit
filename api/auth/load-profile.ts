@@ -17,6 +17,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
+  // Security Check: Authenticate request token to verify ownership
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'Missing or invalid authorization header' });
+    return;
+  }
+
+  const token = authHeader.split(' ')[1];
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+  if (authError || !user || user.id !== userId) {
+    res.status(401).json({ error: 'Unauthorized profile access' });
+    return;
+  }
+
   try {
     const { data, error } = await supabase
       .from('profiles')
