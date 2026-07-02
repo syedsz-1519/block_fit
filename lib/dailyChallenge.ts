@@ -99,35 +99,16 @@ export function generateDailyChallenge(dateStr: string): DailyChallengeLevel {
     difficulty = 'Hard';
   }
 
-  const gridWidth = 8;
-  const gridHeight = 8;
-
-  const offsetX = Math.floor((gridWidth - activeWidth) / 2);
-  const offsetY = Math.floor((gridHeight - activeHeight) / 2);
+  const gridWidth = activeWidth;
+  const gridHeight = activeHeight;
 
   const blockedCells: number[][] = [];
-  const assigned = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(true)); // Block everything initially
-
-  // Unblock active playing area
-  for (let y = offsetY; y < offsetY + activeHeight; y++) {
-    for (let x = offsetX; x < offsetX + activeWidth; x++) {
-      assigned[y][x] = false;
-    }
-  }
-
-  // Populate blockedCells for outer layout boundary
-  for (let y = 0; y < gridHeight; y++) {
-    for (let x = 0; x < gridWidth; x++) {
-      if (x < offsetX || x >= offsetX + activeWidth || y < offsetY || y >= offsetY + activeHeight) {
-        blockedCells.push([x, y]);
-      }
-    }
-  }
+  const assigned = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(false));
 
   const blockedCount = Math.floor(rng() * 3);
   for (let i = 0; i < blockedCount; i++) {
-    const rx = offsetX + Math.floor(rng() * activeWidth);
-    const ry = offsetY + Math.floor(rng() * activeHeight);
+    const rx = Math.floor(rng() * gridWidth);
+    const ry = Math.floor(rng() * gridHeight);
     if (!assigned[ry][rx]) {
       assigned[ry][rx] = true;
       blockedCells.push([rx, ry]);

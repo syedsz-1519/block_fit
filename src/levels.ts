@@ -1,4 +1,4 @@
-import { LevelConfig, BlockShape } from './types';
+import { LevelConfig } from './types';
 
 // Helper to normalize coordinates so they start at 0,0
 export function normalizeOffsets(cells: number[][]): number[][] {
@@ -24,321 +24,219 @@ export function mirrorOffsets(cells: number[][], mirrored: boolean): number[][] 
   return normalizeOffsets(current);
 }
 
-export const PRESET_LEVELS: LevelConfig[] = [
-  {
-    id: 1,
-    name: "World 1: Beginner",
-    gridWidth: 3,
-    gridHeight: 3,
-    blockedCells: [],
-    difficulty: "Easy",
-    parMoves: 3,
-    parTime: 45,
-    availableBlocks: [
-      {
-        cells: [[0, 0], [1, 0]],
-        color: "bg-sage border-b-3 border-sage-dark",
-        name: "Domino"
-      },
-      {
-        cells: [[0, 0], [0, 1], [1, 1]],
-        color: "bg-coral border-b-3 border-coral-dark",
-        name: "L-Tromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [0, 1], [1, 1]],
-        color: "bg-mustard border-b-3 border-mustard-dark",
-        name: "Square-Tetromino"
-      }
-    ],
-    hintSequence: [
-      { blockIndex: 0, x: 0, y: 0, rotations: 0, mirrored: false },
-      { blockIndex: 1, x: 1, y: 1, rotations: 1, mirrored: false },
-      { blockIndex: 2, x: 0, y: 1, rotations: 0, mirrored: false }
-    ]
-  },
-  {
-    id: 2,
-    name: "World 1: Beginner",
-    gridWidth: 4,
-    gridHeight: 4,
-    blockedCells: [[0, 0], [3, 3]], // Corner obstacles
-    difficulty: "Easy",
-    parMoves: 4,
-    parTime: 60,
-    availableBlocks: [
-      {
-        cells: [[0, 0], [1, 0], [2, 0]],
-        color: "bg-teal border-b-3 border-teal-dark",
-        name: "I-Tromino"
-      },
-      {
-        cells: [[0, 0], [0, 1], [1, 1]],
-        color: "bg-coral border-b-3 border-coral-dark",
-        name: "L-Tromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [1, 1], [2, 1]],
-        color: "bg-lavender border-b-3 border-lavender-dark",
-        name: "Z-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [1, 1], [0, 1]],
-        color: "bg-mustard border-b-3 border-mustard-dark",
-        name: "Square-Tetromino"
-      }
-    ],
-    hintSequence: [
-      { blockIndex: 0, x: 1, y: 0, rotations: 0, mirrored: false },
-      { blockIndex: 1, x: 0, y: 1, rotations: 0, mirrored: false },
-      { blockIndex: 2, x: 1, y: 2, rotations: 1, mirrored: false },
-      { blockIndex: 3, x: 2, y: 1, rotations: 0, mirrored: false }
-    ]
-  },
-  {
-    id: 3,
-    name: "World 1: Beginner",
-    gridWidth: 4,
-    gridHeight: 4,
-    blockedCells: [[1, 1], [2, 2]],
-    difficulty: "Easy",
-    parMoves: 4,
-    parTime: 70,
-    availableBlocks: [
-      {
-        cells: [[0, 0], [1, 0], [2, 0], [1, 1]],
-        color: "bg-sage border-b-3 border-sage-dark",
-        name: "T-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [2, 0]],
-        color: "bg-teal border-b-3 border-teal-dark",
-        name: "I-Tromino"
-      },
-      {
-        cells: [[0, 0], [0, 1], [1, 1], [2, 1]],
-        color: "bg-coral border-b-3 border-coral-dark",
-        name: "L-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [0, 1]],
-        color: "bg-lavender border-b-3 border-lavender-dark",
-        name: "L-Tromino"
-      }
-    ],
-    hintSequence: [
-      { blockIndex: 0, x: 0, y: 0, rotations: 2, mirrored: false },
-      { blockIndex: 1, x: 1, y: 3, rotations: 0, mirrored: false },
-      { blockIndex: 2, x: 1, y: 0, rotations: 1, mirrored: false },
-      { blockIndex: 3, x: 0, y: 2, rotations: 0, mirrored: false }
-    ]
-  },
-  {
-    id: 4,
-    name: "World 1: Beginner",
-    gridWidth: 4,
-    gridHeight: 4,
-    blockedCells: [],
-    difficulty: "Easy",
-    parMoves: 4,
-    parTime: 80,
-    availableBlocks: [
-      {
-        cells: [[0, 0], [1, 0], [2, 0], [3, 0]],
-        color: "bg-teal border-b-3 border-teal-dark",
-        name: "Long I-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [0, 1], [1, 1]],
-        color: "bg-mustard border-b-3 border-mustard-dark",
-        name: "Square-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [2, 0], [1, 1]],
-        color: "bg-coral border-b-3 border-coral-dark",
-        name: "T-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [1, 1], [2, 1]],
-        color: "bg-lavender border-b-3 border-lavender-dark",
-        name: "Z-Tetromino"
-      }
-    ],
-    hintSequence: [
-      { blockIndex: 0, x: 0, y: 0, rotations: 0, mirrored: false },
-      { blockIndex: 1, x: 0, y: 1, rotations: 0, mirrored: false },
-      { blockIndex: 2, x: 1, y: 2, rotations: 0, mirrored: false },
-      { blockIndex: 3, x: 1, y: 1, rotations: 1, mirrored: false }
-    ]
-  },
-  {
-    id: 5,
-    name: "World 1: Beginner",
-    gridWidth: 4,
-    gridHeight: 4,
-    blockedCells: [[0, 1], [3, 2]],
-    difficulty: "Easy",
-    parMoves: 4,
-    parTime: 90,
-    availableBlocks: [
-      {
-        cells: [[0, 0], [0, 1], [1, 1], [1, 2]],
-        color: "bg-sage border-b-3 border-sage-dark",
-        name: "Z-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [2, 0], [0, 1]],
-        color: "bg-coral border-b-3 border-coral-dark",
-        name: "J-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [2, 0]],
-        color: "bg-teal border-b-3 border-teal-dark",
-        name: "I-Tromino"
-      },
-      {
-        cells: [[0, 0], [0, 1], [1, 1]],
-        color: "bg-mustard border-b-3 border-mustard-dark",
-        name: "L-Tromino"
-      }
-    ],
-    hintSequence: [
-      { blockIndex: 0, x: 2, y: 0, rotations: 0, mirrored: false },
-      { blockIndex: 1, x: 0, y: 2, rotations: 3, mirrored: false },
-      { blockIndex: 2, x: 0, y: 0, rotations: 0, mirrored: false },
-      { blockIndex: 3, x: 0, y: 1, rotations: 1, mirrored: false }
-    ]
-  },
-  // World 2: Easy (5x5 Grid)
-  {
-    id: 6,
-    name: "World 2: Easy-Fit",
-    gridWidth: 5,
-    gridHeight: 5,
-    blockedCells: [[2, 2]], // Center blocked
-    difficulty: "Medium",
-    parMoves: 6,
-    parTime: 100,
-    availableBlocks: [
-      { cells: [[0, 0], [1, 0], [2, 0], [3, 0]], color: "bg-teal border-b-3 border-teal-dark", name: "I-Tetromino" },
-      { cells: [[0, 0], [1, 0], [2, 0], [0, 1]], color: "bg-coral border-b-3 border-coral-dark", name: "L-Tetromino" },
-      { cells: [[0, 0], [1, 0], [1, 1], [2, 1]], color: "bg-sage border-b-3 border-sage-dark", name: "Z-Tetromino" },
-      { cells: [[0, 0], [1, 0], [0, 1], [1, 1]], color: "bg-mustard border-b-3 border-mustard-dark", name: "Square-Tetromino" },
-      { cells: [[0, 0], [1, 0], [2, 0], [1, 1]], color: "bg-lavender border-b-3 border-lavender-dark", name: "T-Tetromino" },
-      { cells: [[0, 0], [1, 0], [2, 0], [0, 1], [0, 2]], color: "bg-teal border-b-3 border-teal-dark", name: "L-Pentomino" }
-    ],
-    hintSequence: [
-      { blockIndex: 0, x: 0, y: 0, rotations: 0, mirrored: false },
-      { blockIndex: 1, x: 4, y: 0, rotations: 1, mirrored: false },
-      { blockIndex: 2, x: 0, y: 3, rotations: 0, mirrored: false },
-      { blockIndex: 3, x: 2, y: 3, rotations: 0, mirrored: false },
-      { blockIndex: 4, x: 1, y: 1, rotations: 1, mirrored: false },
-      { blockIndex: 5, x: 0, y: 1, rotations: 0, mirrored: false }
-    ]
-  },
-  // Level 16: Matches the exact 6x6 Grid screen in the prompt image!
-  {
-    id: 16,
-    name: "World 3: Geometry Master",
-    gridWidth: 6,
-    gridHeight: 6,
-    blockedCells: [[0, 4], [1, 4], [2, 4], [1, 5]], // Sage & Lavender placements
-    difficulty: "Hard",
-    parMoves: 8,
-    parTime: 120,
-    availableBlocks: [
-      {
-        cells: [[0, 0], [0, 1], [0, 2], [1, 2]],
-        color: "bg-[#a8cfbd] border-b-3 border-sage-dark", // Sage
-        name: "L-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [2, 0], [1, 1]],
-        color: "bg-[#c9c6c2] border-b-3 border-lavender-dark", // Lavender
-        name: "T-Tetromino"
-      },
-      {
-        cells: [[0, 0], [0, 1], [1, 1], [1, 2], [0, 2]],
-        color: "bg-[#e49a8e] border-b-3 border-coral-dark", // Coral
-        name: "P-Pentomino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [0, 1], [1, 1]],
-        color: "bg-[#e6c88e] border-b-3 border-mustard-dark", // Mustard
-        name: "Square-Tetromino"
-      },
-      {
-        cells: [[0, 0], [1, 0], [2, 0], [3, 0]],
-        color: "bg-[#8ec9c4] border-b-3 border-teal-dark", // Teal
-        name: "I-Tetromino"
-      }
-    ],
-    hintSequence: [
-      { blockIndex: 0, x: 4, y: 0, rotations: 0, mirrored: false },
-      { blockIndex: 1, x: 0, y: 4, rotations: 0, mirrored: false },
-      { blockIndex: 2, x: 1, y: 1, rotations: 0, mirrored: false },
-      { blockIndex: 3, x: 0, y: 0, rotations: 0, mirrored: false },
-      { blockIndex: 4, x: 3, y: 3, rotations: 1, mirrored: false }
-    ]
+export function seededRandom(seedStr: string) {
+  let h = 1779033703 ^ seedStr.length;
+  for (let i = 0; i < seedStr.length; i++) {
+    h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
   }
-];
+  let seed = h >>> 0;
+  return function () {
+    seed = (Math.imul(seed ^ 12345, 1103515245) + 12345) >>> 0;
+    return (seed & 0x3fffffff) / 0x40000000;
+  };
+}
 
-// Add generic levels to complete level count up to 15 + extras
-for (let i = 1; i <= 50; i++) {
-  if (PRESET_LEVELS.find(l => l.id === i)) continue;
-  
-  // Dynamically generate standard levels
-  const size = i <= 5 ? 4 : i <= 12 ? 5 : 6;
-  const numBlocks = i <= 5 ? 4 : i <= 12 ? 5 : 6;
-  const blockedCount = Math.floor(Math.random() * 3);
-  const blockedCells: [number, number][] = [];
-  while (blockedCells.length < blockedCount) {
-    const x = Math.floor(Math.random() * size);
-    const y = Math.floor(Math.random() * size);
-    if (!blockedCells.some(c => c[0] === x && c[1] === y)) {
-      blockedCells.push([x, y]);
+export function generatePresetLevel(id: number): LevelConfig {
+  const rng = seededRandom("level-preset-" + id);
+  const isHard = id % 4 === 0;
+
+  // Determine grid size based on level ID & difficulty progression
+  let size = 4;
+  if (id <= 3) {
+    size = 3;
+  } else if (id === 4) {
+    size = 4; // Hard level
+  } else if (id <= 7) {
+    size = 4;
+  } else if (id === 8) {
+    size = 5; // Hard level
+  } else if (id <= 10) {
+    size = 4;
+  } else if (id <= 11) {
+    size = 5;
+  } else if (id === 12) {
+    size = 6; // Hard level
+  } else if (id <= 15) {
+    size = 5;
+  } else if (id === 16) {
+    size = 6; // Hard level
+  } else if (id <= 19) {
+    size = 5;
+  } else if (id === 20) {
+    size = 6; // Hard level
+  } else if (id <= 23) {
+    size = 5;
+  } else if (id === 24) {
+    size = 6; // Hard level
+  } else if (id <= 27) {
+    size = 6;
+  } else if (id === 28) {
+    size = 7; // Hard level
+  } else if (id <= 31) {
+    size = 6;
+  } else if (id === 32) {
+    size = 7; // Hard level
+  } else if (id <= 35) {
+    size = 6;
+  } else if (id === 36) {
+    size = 7; // Hard level
+  } else if (id <= 39) {
+    size = 6;
+  } else if (id === 40) {
+    size = 7; // Hard level
+  } else if (id <= 43) {
+    size = 6;
+  } else if (id === 44) {
+    size = 7; // Hard level
+  } else if (id <= 47) {
+    size = 6;
+  } else if (id === 48) {
+    size = 7; // Hard level
+  } else {
+    size = 7;
+  }
+
+  const gridWidth = size;
+  const gridHeight = size;
+
+  // Premium colors matching UI specification
+  const colors = [
+    "bg-sage border-b-3 border-sage-dark shadow-sm",
+    "bg-coral border-b-3 border-coral-dark shadow-sm",
+    "bg-mustard border-b-3 border-mustard-dark shadow-sm",
+    "bg-teal border-b-3 border-teal-dark shadow-sm",
+    "bg-lavender border-b-3 border-lavender-dark shadow-sm",
+    "bg-[#5c6ac4] border-b-3 border-[#3f4eae] shadow-sm",
+    "bg-[#ec4899] border-b-3 border-[#be185d] shadow-sm",
+    "bg-[#10b981] border-b-3 border-[#047857] shadow-sm",
+    "bg-[#f59e0b] border-b-3 border-[#b45309] shadow-sm",
+    "bg-[#0ea5e9] border-b-3 border-[#0369a1] shadow-sm",
+    "bg-[#8b5cf6] border-b-3 border-[#6d28d9] shadow-sm",
+  ];
+
+  const blockNames = ['Mono', 'Domino', 'Tromino', 'Tetromino', 'Pentomino'];
+
+  // Add random internal blocked obstacle cells (if grid size is large enough)
+  let blockedCount = 0;
+  if (size === 4) blockedCount = Math.floor(rng() * 2); // 0 or 1
+  else if (size === 5) blockedCount = Math.floor(rng() * 2) + 1; // 1 or 2
+  else if (size === 6) blockedCount = Math.floor(rng() * 3) + 1; // 1 to 3
+  else if (size === 7) blockedCount = Math.floor(rng() * 4) + 1; // 1 to 4
+
+  const blockedCells: number[][] = [];
+  const assigned = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(false));
+
+  let placedBlocked = 0;
+  for (let attempt = 0; attempt < 15 && placedBlocked < blockedCount; attempt++) {
+    const rx = Math.floor(rng() * gridWidth);
+    const ry = Math.floor(rng() * gridHeight);
+    if (!assigned[ry][rx]) {
+      assigned[ry][rx] = true;
+      blockedCells.push([rx, ry]);
+      placedBlocked++;
     }
   }
 
-  // Pre-configured block shapes
-  const colors = [
-    "bg-sage border-b-3 border-sage-dark",
-    "bg-coral border-b-3 border-coral-dark",
-    "bg-mustard border-b-3 border-mustard-dark",
-    "bg-teal border-b-3 border-teal-dark",
-    "bg-lavender border-b-3 border-lavender-dark"
-  ];
+  const availableBlocks: any[] = [];
+  const hintSequence: any[] = [];
+  let blockCounter = 0;
 
-  const genericShapes: Omit<BlockShape, 'id'>[] = [
-    { cells: [[0,0], [1,0], [0,1]], color: colors[0], name: "L-Tromino" },
-    { cells: [[0,0], [1,0], [2,0]], color: colors[1], name: "I-Tromino" },
-    { cells: [[0,0], [1,0], [0,1], [1,1]], color: colors[2], name: "Square" },
-    { cells: [[0,0], [1,0], [2,0], [1,1]], color: colors[3], name: "T-Tetromino" },
-    { cells: [[0,0], [0,1], [1,1], [2,1]], color: colors[4], name: "L-Tetromino" },
-    { cells: [[0,0], [1,0], [1,1], [2,1]], color: colors[0], name: "Z-Tetromino" }
-  ];
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if (assigned[y][x]) continue;
 
-  const levelBlocks = genericShapes.slice(0, numBlocks);
+      const blockCells: [number, number][] = [[x, y]];
+      assigned[y][x] = true;
 
-  PRESET_LEVELS.push({
-    id: i,
-    name: i <= 5 ? "World 1: Beginner" : i <= 12 ? "World 2: Challenger" : "World 3: Guru",
-    gridWidth: size,
-    gridHeight: size,
+      // Determine size of block to grow
+      const targetSize = Math.floor(rng() * 3) + 2; // Trominos (3) to Pentominos (5)
+
+      const queue: [number, number][] = [[x, y]];
+      while (queue.length > 0 && blockCells.length < targetSize) {
+        const [cx, cy] = queue.shift()!;
+        const neighbors: [number, number][] = [
+          [cx + 1, cy],
+          [cx - 1, cy],
+          [cx, cy + 1],
+          [cx, cy - 1],
+        ].sort(() => rng() - 0.5) as [number, number][];
+
+        for (const [nx, ny] of neighbors) {
+          if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
+            if (!assigned[ny][nx] && blockCells.length < targetSize) {
+              assigned[ny][nx] = true;
+              blockCells.push([nx, ny]);
+              queue.push([nx, ny]);
+            }
+          }
+        }
+      }
+
+      const minX = Math.min(...blockCells.map((c) => c[0]));
+      const minY = Math.min(...blockCells.map((c) => c[1]));
+      const relativeCells = blockCells.map(([bx, by]) => [bx - minX, by - minY]);
+
+      const color = colors[blockCounter % colors.length];
+      const name = `${blockNames[Math.min(blockCells.length - 1, 4)]}-${blockCounter + 1}`;
+
+      availableBlocks.push({ cells: relativeCells, color, name });
+      hintSequence.push({ blockIndex: blockCounter, x: minX, y: minY, rotations: 0, mirrored: false });
+
+      blockCounter++;
+    }
+  }
+
+  // Shuffle blocks to make it a puzzle
+  const blockIndices = Array.from({ length: availableBlocks.length }, (_, i) => i);
+  for (let i = blockIndices.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const temp = blockIndices[i];
+    blockIndices[i] = blockIndices[j];
+    blockIndices[j] = temp;
+  }
+
+  const shuffledBlocks = blockIndices.map((idx) => availableBlocks[idx]);
+  const shuffledHints = blockIndices
+    .map((originalIdx, newIdx) => {
+      const originalHint = hintSequence.find((h) => h.blockIndex === originalIdx)!;
+      return { blockIndex: newIdx, x: originalHint.x, y: originalHint.y, rotations: originalHint.rotations, mirrored: originalHint.mirrored };
+    })
+    .sort((a, b) => a.blockIndex - b.blockIndex);
+
+  let difficulty: LevelConfig['difficulty'] = 'Medium';
+  if (isHard) {
+    difficulty = 'Hard';
+  } else if (id <= 15) {
+    difficulty = 'Easy';
+  } else if (id <= 30) {
+    difficulty = 'Medium';
+  } else {
+    difficulty = 'Hard';
+  }
+
+  const worldName =
+    id <= 10 ? "World 1: Beginner" :
+    id <= 20 ? "World 2: Intermediate" :
+    id <= 30 ? "World 3: Advanced" :
+    id <= 40 ? "World 4: Expert" :
+    "World 5: Master";
+
+  const parMoves = shuffledBlocks.length;
+  const parTime = Math.max(30, shuffledBlocks.length * 15 + size * 5);
+
+  return {
+    id,
+    name: worldName,
+    gridWidth,
+    gridHeight,
     blockedCells,
-    difficulty: i <= 5 ? "Easy" : i <= 12 ? "Medium" : "Hard",
-    parMoves: numBlocks + 2,
-    parTime: 60 + size * 15,
-    availableBlocks: levelBlocks,
-    hintSequence: levelBlocks.map((b, idx) => ({
-      blockIndex: idx,
-      x: idx % (size - 1),
-      y: Math.floor(idx / (size - 1)),
-      rotations: idx % 4,
-      mirrored: idx % 2 === 0
-    }))
-  });
+    availableBlocks: shuffledBlocks,
+    parMoves,
+    parTime,
+    difficulty,
+    hintSequence: shuffledHints,
+  };
 }
 
-// Sort presets by level id
-PRESET_LEVELS.sort((a, b) => a.id - b.id);
+export const PRESET_LEVELS: LevelConfig[] = Array.from({ length: 50 }, (_, i) => generatePresetLevel(i + 1));

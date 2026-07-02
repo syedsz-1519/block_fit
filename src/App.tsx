@@ -794,8 +794,7 @@ export default function App() {
     setIsDailyChallenge(false);
     
     const originalLevel = PRESET_LEVELS.find(l => l.id === level.id) || level;
-    let adjustedLevel = getAdjustedLevel(originalLevel, profile.difficultySetting || 'Medium');
-    adjustedLevel = centerLevelOn8x8(adjustedLevel);
+    const adjustedLevel = getAdjustedLevel(originalLevel, profile.difficultySetting || 'Medium');
 
     setActiveLevel(adjustedLevel);
     setMoveCount(0);
