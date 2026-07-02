@@ -737,6 +737,26 @@ export default function App() {
     }
   };
 
+  const handleResetProgress = () => {
+    sound.playClick();
+    if (confirm("Are you sure you want to reset all your game progress? This will delete all completed levels and stars. This cannot be undone.")) {
+      const resetProfile = {
+        ...profile,
+        levelProgress: {},
+        currentLevel: 1,
+        hintsRemaining: 3
+      };
+      setProfile(resetProfile);
+      
+      // If logged in, save the reset state to the database
+      if (profile.isLoggedIn) {
+        saveProfileToCloud(resetProfile);
+      }
+      
+      alert("Game progress has been reset successfully! Starting a new game.");
+    }
+  };
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authEmail || !authPassword) {
@@ -4651,6 +4671,18 @@ export default function App() {
                       />
                     </button>
                   </div>
+                </div>
+
+                {/* Danger Zone: Reset Game */}
+                <div className="border-t border-gray-150 dark:border-gray-900 pt-4">
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-red-500 mb-2">Danger Zone</h4>
+                  <button 
+                    onClick={handleResetProgress}
+                    className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-extrabold text-xs rounded-xl border border-red-500/20 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset Game Progress (New Game)</span>
+                  </button>
                 </div>
 
                 {/* Cloud Account Section */}
