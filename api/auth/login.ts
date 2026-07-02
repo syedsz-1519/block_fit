@@ -34,12 +34,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     const session = data.session;
     const username = user?.user_metadata?.username || user?.email?.split('@')[0] || 'Player';
 
+    // Fetch saved profile from database
+    const { data: profileRow } = await supabase
+      .from('profiles')
+      .select('profile_data')
+      .eq('user_id', user?.id)
+      .maybeSingle();
+
     res.status(200).json({
       success: true,
       userId: user?.id,
       email: user?.email,
       username,
       token: session?.access_token,
+      profile: profileRow ? profileRow.profile_data : null
     });
   } catch (err) {
     console.error('[auth/login] Error:', err);

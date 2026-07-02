@@ -1,6 +1,10 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
+import signupHandler from "./api/auth/signup";
+import loginHandler from "./api/auth/login";
+import saveProfileHandler from "./api/auth/save-profile";
+import loadProfileHandler from "./api/auth/load-profile";
 
 interface LeaderboardEntry {
   username: string;
@@ -570,6 +574,12 @@ async function startServer() {
     syncProfiles.set(cleanCode, profile);
     res.json({ success: true });
   });
+
+  // User Authentication & Database Sync Routes
+  app.post("/api/auth/signup", (req, res) => signupHandler(req as any, res as any));
+  app.post("/api/auth/login", (req, res) => loginHandler(req as any, res as any));
+  app.post("/api/auth/save-profile", (req, res) => saveProfileHandler(req as any, res as any));
+  app.get("/api/auth/load-profile", (req, res) => loadProfileHandler(req as any, res as any));
 
   // Vite middleware for assets / hot reloading
   if (process.env.NODE_ENV !== "production") {

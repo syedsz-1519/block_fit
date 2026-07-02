@@ -63,3 +63,22 @@ alter table sync_profiles enable row level security;
 --   '0 * * * *',   -- every hour
 --   $$delete from sync_profiles where created_at < now() - interval '24 hours'$$
 -- );
+
+-- ────────────────────────────────────────────────────────────
+-- profiles
+-- Stores persistent user profile data (progress, themes, stars, etc.)
+-- ────────────────────────────────────────────────────────────
+create table if not exists profiles (
+  user_id      text primary key, -- Supabase auth user ID
+  email        text not null,
+  username     text not null,
+  profile_data jsonb not null,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+-- Row Level Security: public read, service-role only writes.
+alter table profiles enable row level security;
+
+create policy "public read profiles" on profiles
+  for select using (true);

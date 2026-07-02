@@ -37,7 +37,9 @@ import {
   Gauge,
   Timer,
   TimerOff,
-  Zap
+  Zap,
+  Key,
+  ShieldCheck
 } from 'lucide-react';
 import { PRESET_LEVELS, normalizeOffsets, rotateOffsets, mirrorOffsets } from './levels';
 import { sound } from './sound';
@@ -338,6 +340,16 @@ export default function App() {
   const [leaderboardScores, setLeaderboardScores] = useState<LeaderboardEntry[]>([]);
   const [isLoadingScores, setIsLoadingScores] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
+
+  // --- User Authentication States ---
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authUsername, setAuthUsername] = useState('');
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [authErrorMessage, setAuthErrorMessage] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
 
   // --- HTML App Url (from process env / fallback) ---
   const appUrl = "https://ai.studio/build";
@@ -675,6 +687,139 @@ export default function App() {
       sound.playInvalid();
     } finally {
       setSyncLoading(false);
+    }
+  };
+
+  // --- Save Profile to cloud for Authed User ---
+  const saveProfileToCloud = async (overrideProfile?: any) => {
+    const profToSave = overrideProfile || profile;
+    if (!profToSave.isLoggedIn || !profToSave.userId) return;
+    try {
+      await fetch('/api/auth/save-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: profToSave.userId,
+          email: profToSave.userEmail,
+          username: profToSave.username,
+          profileData: profToSave
+        })
+      });
+    } catch (e) {
+      console.error('Failed to auto-save profile to cloud:', e);
+    }
+  };
+
+  const handleLogout = () => {
+    sound.playClick();
+    if (confirm("Are you sure you want to log out? Your guest profile will be reset.")) {
+      const newGuestId = `guest_${Math.random().toString(36).substr(2, 9)}`;
+      setProfile({
+        levelProgress: {},
+        currentLevel: 1,
+        hintsRemaining: 3,
+        isSubscribed: false,
+        theme: 'light',
+        soundEnabled: true,
+        musicEnabled: true,
+        hapticEnabled: true,
+        colorblindMode: false,
+        soundscape: 'zen',
+        username: `Guest_${newGuestId.split('_')[1].toUpperCase()}`,
+        userId: newGuestId,
+        guestCreatedAt: new Date().toISOString(),
+        isLoggedIn: false,
+        userEmail: '',
+        restrictedMode: false,
+        authToken: ''
+      });
+      setCurrentScreen('main_menu');
+    }
+  };
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authEmail || !authPassword) {
+      setAuthErrorMessage("Email and password are required.");
+      return;
+    }
+    if (authMode === 'signup' && !authUsername) {
+      setAuthErrorMessage("Username is required.");
+      return;
+    }
+    if (authMode === 'signup' && !termsAccepted) {
+      setAuthErrorMessage("You must accept the Terms and Conditions to register.");
+      return;
+    }
+
+    setAuthLoading(true);
+    setAuthErrorMessage('');
+
+    try {
+      const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/signup';
+      const body = authMode === 'login' 
+        ? { email: authEmail, password: authPassword }
+        : { email: authEmail, password: authPassword, username: authUsername };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setAuthErrorMessage(data.error || 'Authentication failed.');
+        sound.playInvalid();
+      } else {
+        sound.playWin();
+        if (authMode === 'login') {
+          // If login returned a saved profile, load it!
+          const loadedProfile = data.profile ? {
+            ...data.profile,
+            isLoggedIn: true,
+            userEmail: data.email,
+            userId: data.userId,
+            authToken: data.token,
+            restrictedMode: false
+          } : {
+            ...profile,
+            username: data.username,
+            userId: data.userId,
+            isLoggedIn: true,
+            userEmail: data.email,
+            authToken: data.token,
+            restrictedMode: false
+          };
+          setProfile(loadedProfile);
+        } else {
+          alert("Account created successfully! Please sign in to verify.");
+          setAuthMode('login');
+          setAuthLoading(false);
+          return;
+        }
+        setCurrentScreen('main_menu');
+      }
+    } catch (err) {
+      setAuthErrorMessage('Network error during authentication.');
+      sound.playInvalid();
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    sound.playClick();
+    try {
+      const res = await fetch('/api/auth/google');
+      if (res.ok) {
+        const { url } = await res.json();
+        window.location.href = url;
+      } else {
+        alert("Failed to get Google login URL.");
+      }
+    } catch (e) {
+      alert("Network error starting Google login.");
     }
   };
 
@@ -1249,10 +1394,10 @@ export default function App() {
 
       // Save progress and submit score
       if (isDailyChallenge) {
-        setProfile(prev => ({
-          ...prev,
+        const updatedProfile = {
+          ...profile,
           levelProgress: {
-            ...prev.levelProgress,
+            ...profile.levelProgress,
             [`daily_${dailyDate}`]: {
               stars,
               moves: moveCount + 1,
@@ -1261,7 +1406,9 @@ export default function App() {
               completedAt: new Date().toLocaleDateString()
             }
           }
-        }));
+        };
+        setProfile(updatedProfile);
+        saveProfileToCloud(updatedProfile);
 
         fetch('/api/daily-challenge/submit', {
           method: 'POST',
@@ -1291,11 +1438,11 @@ export default function App() {
 
         const nextLevelUnlocked = Math.max(profile.currentLevel, activeLevel.id + 1);
 
-        setProfile(prev => ({
-          ...prev,
+        const updatedProfile = {
+          ...profile,
           currentLevel: nextLevelUnlocked,
           levelProgress: {
-            ...prev.levelProgress,
+            ...profile.levelProgress,
             [activeLevel.id]: {
               stars: betterStars,
               moves: betterMoves,
@@ -1303,7 +1450,9 @@ export default function App() {
               completed: true
             }
           }
-        }));
+        };
+        setProfile(updatedProfile);
+        saveProfileToCloud(updatedProfile);
 
         // Submit score to global server leaderboard!
         const endpoint = isSpeedrunMode ? '/api/speedrun/leaderboard' : '/api/leaderboard';
@@ -1912,6 +2061,185 @@ export default function App() {
             </motion.div>
           </div>
           <div className="absolute bottom-4 right-4 text-[10px] opacity-40 font-mono">v1.0.0</div>
+        </motion.div>
+      )}
+
+      {/* 1.5. USER AUTHENTICATION SCREEN */}
+      {currentScreen === 'auth' && (
+        <motion.div
+          key="auth"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-hidden"
+        >
+          {/* Backdrop/Accent */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#426657]/10 to-transparent -z-10" />
+
+          <div className="w-full max-w-sm bg-white dark:bg-gray-950 rounded-3xl p-6 border border-gray-150/10 dark:border-gray-900 shadow-2xl relative">
+            
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-[#426657]/10 dark:bg-emerald-950/30 flex items-center justify-center mx-auto mb-3 border border-[#426657]/20">
+                <Key className="w-6 h-6 text-[#426657] dark:text-emerald-400" />
+              </div>
+              <h2 className="font-display text-2xl font-extrabold text-primary dark:text-white">
+                {authMode === 'login' ? 'Welcome Back' : 'Create Account'}
+              </h2>
+              <p className="text-xs opacity-70 mt-1">
+                {authMode === 'login' ? 'Sign in to sync your puzzle progress' : 'Get a personal cloud account to save your progress'}
+              </p>
+            </div>
+
+            {/* Error Message */}
+            {authErrorMessage && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs rounded-2xl p-3 mb-4 font-medium">
+                ⚠️ {authErrorMessage}
+              </div>
+            )}
+
+            {/* Toggle Tabs */}
+            <div className="flex bg-gray-100/70 dark:bg-gray-900/50 p-1 rounded-2xl border border-gray-200/50 dark:border-gray-800/40 mb-5">
+              <button
+                type="button"
+                onClick={() => { sound.playClick(); setAuthMode('login'); setAuthErrorMessage(''); }}
+                className={`flex-1 py-2 text-xs font-extrabold rounded-xl transition-all ${
+                  authMode === 'login'
+                    ? 'bg-[#426657] text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => { sound.playClick(); setAuthMode('signup'); setAuthErrorMessage(''); }}
+                className={`flex-1 py-2 text-xs font-extrabold rounded-xl transition-all ${
+                  authMode === 'signup'
+                    ? 'bg-[#426657] text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                }`}
+              >
+                Register
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              {authMode === 'signup' && (
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest opacity-60">Username</label>
+                  <input
+                    type="text"
+                    required
+                    value={authUsername}
+                    onChange={(e) => setAuthUsername(e.target.value)}
+                    placeholder="e.g. PuzzleGuru"
+                    className="w-full mt-1.5 bg-gray-100 dark:bg-gray-900 border border-transparent focus:border-emerald-500 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-primary dark:text-white"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-widest opacity-60">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full mt-1.5 bg-gray-100 dark:bg-gray-900 border border-transparent focus:border-emerald-500 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-primary dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-widest opacity-60">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full mt-1.5 bg-gray-100 dark:bg-gray-900 border border-transparent focus:border-emerald-500 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-primary dark:text-white"
+                />
+              </div>
+
+              {/* Terms and Conditions Checkbox (Sign Up Mode Only) */}
+              {authMode === 'signup' && (
+                <div className="pt-2">
+                  <label className="flex items-start gap-2.5 text-xs opacity-85 cursor-pointer select-none leading-tight">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="mt-0.5 accent-[#426657]"
+                    />
+                    <span>
+                      I agree to the{' '}
+                      <button
+                        type="button"
+                        onClick={() => { sound.playClick(); setShowTermsModal(true); }}
+                        className="text-[#426657] dark:text-emerald-400 font-extrabold underline hover:text-[#355246]"
+                      >
+                        Privacy Policy & Terms
+                      </button>
+                    </span>
+                  </label>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={authLoading || (authMode === 'signup' && !termsAccepted)}
+                className="w-full py-3.5 bg-[#426657] hover:bg-[#355246] disabled:opacity-50 text-white rounded-2xl font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                {authLoading ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <span>{authMode === 'login' ? 'Sign In' : 'Create Account'}</span>
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-5 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200/50 dark:border-gray-800" />
+              </div>
+              <span className="relative px-3 bg-white dark:bg-gray-900 text-[10px] font-bold uppercase tracking-wider opacity-45">
+                Or
+              </span>
+            </div>
+
+            {/* Google Login */}
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full py-3.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 rounded-2xl font-bold text-xs text-primary dark:text-white flex items-center justify-center gap-2 transition-all shadow-sm"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.48 0-6.3-2.82-6.3-6.3s2.82-6.3 6.3-6.3c1.558 0 2.978.569 4.08 1.505l2.972-2.972C18.98 2.502 15.792 1.5 12.24 1.5 6.363 1.5 1.5 6.363 1.5 12.24s4.863 10.74 10.74 10.74c6.111 0 11.232-4.402 11.232-10.74 0-.693-.075-1.349-.195-1.955H12.24Z" />
+              </svg>
+              <span>Continue with Google</span>
+            </button>
+
+            {/* Play as Guest Option */}
+            <div className="text-center mt-5">
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  setProfile(prev => ({ ...prev, restrictedMode: true }));
+                  setCurrentScreen('main_menu');
+                }}
+                className="text-xs font-bold opacity-60 hover:opacity-100 transition-opacity hover:underline"
+              >
+                Play as Guest (Restricted Progress)
+              </button>
+            </div>
+
+          </div>
         </motion.div>
       )}
 
@@ -4325,6 +4653,45 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Cloud Account Section */}
+                <div className="border-t border-gray-100 dark:border-gray-900 pt-4">
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-2">Cloud Account</h4>
+                  {profile.isLoggedIn ? (
+                    <div className="flex flex-col gap-2 bg-gray-50 dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-800">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-gray-400 dark:text-gray-500 font-bold">Email:</span>
+                        <span className="font-bold text-gray-800 dark:text-gray-200 truncate max-w-[170px]">{profile.userEmail}</span>
+                      </div>
+                      <div className="flex gap-2 mt-1">
+                        <button 
+                          onClick={() => { sound.playClick(); saveProfileToCloud(); }}
+                          className="flex-grow bg-[#426657] hover:bg-[#355246] text-white font-extrabold text-[10px] py-2 rounded-xl transition-all"
+                        >
+                          ☁️ Sync Progress
+                        </button>
+                        <button 
+                          onClick={handleLogout}
+                          className="bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold text-[10px] px-3.5 py-2 rounded-xl border border-red-500/20 transition-all"
+                        >
+                          Log Out
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => {
+                        sound.playClick();
+                        setIsSettingsOpen(false);
+                        setCurrentScreen('auth');
+                      }}
+                      className="w-full py-3 bg-[#426657] hover:bg-[#355246] text-white font-extrabold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all"
+                    >
+                      <Key className="w-3.5 h-3.5" />
+                      <span>🔑 Sign In or Register (Save Progress)</span>
+                    </button>
+                  )}
+                </div>
+
                 {/* Cross Platform Synchronizer */}
                 <div className="border-t border-gray-100 dark:border-gray-900 pt-4">
                   <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-2">Cross-Platform Sync</h4>
@@ -4381,6 +4748,66 @@ export default function App() {
                   )}
                 </div>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* --- OVERLAY 1.8: TERMS & PRIVACY POLICY MODAL --- */}
+      <AnimatePresence>
+        {showTermsModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white dark:bg-gray-950 rounded-3xl p-6 w-full max-w-sm border border-gray-150 dark:border-gray-900 shadow-2xl relative z-10 text-primary dark:text-white"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-extrabold text-base flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                  <span>Privacy & Data Policy</span>
+                </h3>
+                <button
+                  onClick={() => { sound.playClick(); setShowTermsModal(false); }}
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-4 text-xs leading-relaxed max-h-60 overflow-y-auto pr-1">
+                <div>
+                  <h4 className="font-extrabold text-[#426657] dark:text-emerald-400 mb-1">1. What Data We Collect</h4>
+                  <p className="opacity-70">
+                    To save your progress and enable live leaderboard competition, we collect your email address, username, and level performance records (stars, moves, and seconds).
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-[#426657] dark:text-emerald-400 mb-1">2. How Your Data is Used</h4>
+                  <p className="opacity-70">
+                    We use your data solely to maintain your online puzzle profile and synchronise your progress across devices. We do not use tracking scripts or run external ads targeting your profile.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-[#426657] dark:text-emerald-400 mb-1">3. Security & Safety Guarantee</h4>
+                  <p className="opacity-70">
+                    Your personal information is strictly private and stored securely. We will **never sell, share, rent, or lease** your data to any third-party advertisers, companies, or analytics firms.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setTermsAccepted(true);
+                  setShowTermsModal(false);
+                }}
+                className="w-full mt-6 py-3 bg-[#426657] hover:bg-[#355246] text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
+              >
+                <Check className="w-4 h-4" />
+                <span>Agree & Close</span>
+              </button>
             </motion.div>
           </div>
         )}
