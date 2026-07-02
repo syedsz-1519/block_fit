@@ -448,6 +448,50 @@ export default function App() {
     }
   }, [currentScreen]);
 
+  // --- Keyboard Shortcuts for Rotate & Mirror ---
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (currentScreen !== 'gameplay') return;
+      if (!draggedBlock) return;
+
+      const key = e.key.toLowerCase();
+      if (key === 'r' || e.key === ' ') {
+        e.preventDefault();
+        setDraggedBlock(prev => {
+          if (!prev) return null;
+          const nextRotations = (prev.rotations + 1) % 4;
+          let transformed = rotateOffsets(prev.originalCells || prev.cells, nextRotations);
+          transformed = mirrorOffsets(transformed, prev.mirrored);
+          sound.playRotate();
+          triggerHaptic('rotate');
+          return {
+            ...prev,
+            rotations: nextRotations,
+            cells: transformed
+          };
+        });
+      } else if (key === 'f' || key === 'm') {
+        e.preventDefault();
+        setDraggedBlock(prev => {
+          if (!prev) return null;
+          const nextMirrored = !prev.mirrored;
+          let transformed = rotateOffsets(prev.originalCells || prev.cells, prev.rotations);
+          transformed = mirrorOffsets(transformed, nextMirrored);
+          sound.playRotate();
+          triggerHaptic('mirror');
+          return {
+            ...prev,
+            mirrored: nextMirrored,
+            cells: transformed
+          };
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentScreen, draggedBlock]);
+
   // --- Sudoku Live Conflicts Tracker ---
   useEffect(() => {
     if (isSudokuMode && sudokuGrid) {
@@ -1564,7 +1608,8 @@ export default function App() {
       cells: transformed,
       color: blockColor,
       rotations,
-      mirrored
+      mirrored,
+      originalCells: block.originalCells || blockCells
     });
 
     setDragOffset({ x: offsetX, y: offsetY });
@@ -3945,16 +3990,29 @@ export default function App() {
                       ))}
                     </div>
 
-                    {/* Small Mirror Badge trigger */}
+                    {/* Action buttons on card corners for mobile ease */}
                     <button 
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleMirrorBlock(block.id);
                       }}
-                      className="absolute -top-1.5 -right-1.5 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 p-1 rounded-full shadow text-[8px] font-bold text-gray-800 dark:text-gray-200"
+                      className="absolute -top-1.5 -left-1.5 w-5.5 h-5.5 bg-gray-250 dark:bg-gray-800 hover:bg-emerald-500/25 active:scale-90 rounded-full shadow text-[9px] font-bold text-gray-800 dark:text-gray-200 flex items-center justify-center transition-all z-10"
                       title="Mirror Block"
                     >
                       ↔
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRotateBlock(block.id);
+                      }}
+                      className="absolute -top-1.5 -right-1.5 w-5.5 h-5.5 bg-gray-250 dark:bg-gray-800 hover:bg-emerald-500/25 active:scale-90 rounded-full shadow text-[9px] font-bold text-gray-800 dark:text-gray-200 flex items-center justify-center transition-all z-10"
+                      title="Rotate Block"
+                    >
+                      ↻
                     </button>
                   </div>
                 );
