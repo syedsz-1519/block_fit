@@ -1,0 +1,17 @@
+{
+  "short_name": "BlockFit",
+  "name": "Block Fit Puzzle",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#150f38",
+  "background_color": "#150f38",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}
