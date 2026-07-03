@@ -27,8 +27,14 @@ if (!supabaseUrl || !supabaseServiceKey) {
 // Service-role key is used because these calls only ever happen server-side
 // (inside Vercel serverless functions), NEVER in the browser — so RLS stays
 // strict on all client-side access and we bypass it intentionally here.
-export const supabase = createClient(supabaseUrl ?? '', supabaseServiceKey ?? '', {
-  auth: {
+const fallbackUrl = 'https://placeholder-project.supabase.co';
+const fallbackKey = 'placeholder-key-for-local-startup-without-crash';
+
+export const supabase = createClient(
+  supabaseUrl || fallbackUrl,
+  supabaseServiceKey || fallbackKey,
+  {
+    auth: {
     persistSession: false,      // no cookie/localStorage — server-side only
     autoRefreshToken: false,    // no background token refresh in a function
     detectSessionInUrl: false,  // not a browser
