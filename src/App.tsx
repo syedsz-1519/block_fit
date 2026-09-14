@@ -47,6 +47,7 @@ import { LevelConfig, BlockShape, PlacedBlock, PlayerProfile, LeaderboardEntry }
 import { VictoryParticles } from './components/VictoryParticles';
 import { SudokuGridData, SudokuColor, SudokuValidator } from './sudokuLogic';
 import { SudokuGridRenderer } from './components/SudokuGridRenderer';
+import { DemoVideoPlayer } from './components/DemoVideoPlayer';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -4978,73 +4979,108 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* --- OVERLAY 1.5: HOW TO PLAY MODAL --- */}
+      {/* --- OVERLAY 1.5: HOW TO PLAY MODAL WITH DEMO VIDEO --- */}
       <AnimatePresence>
         {isHowToPlayOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-gray-950 rounded-3xl p-6 w-full max-w-md border border-gray-150 dark:border-gray-850 shadow-2xl relative z-10 text-primary dark:text-white"
+              className="bg-white dark:bg-gray-950 rounded-3xl p-6 w-full max-w-2xl border border-gray-150 dark:border-gray-850 shadow-2xl relative z-10 text-primary dark:text-white my-6"
             >
-              <div className="text-center mb-5">
+              {/* Header */}
+              <div className="text-center mb-6">
                 <div className="w-12 h-12 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
                   <Info className="w-6 h-6" />
                 </div>
-                <h3 className="font-extrabold text-xl">How to Play</h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Master the geometric puzzles in simple steps</p>
+                <h3 className="font-extrabold text-2xl">How to Play Block Fit</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Watch the demo and master the basics</p>
               </div>
 
-              <div className="space-y-4 my-2 text-sm text-left">
+              {/* Demo Video Section */}
+              <div className="mb-8 bg-gray-50 dark:bg-gray-900/30 rounded-2xl p-4">
+                <DemoVideoPlayer />
+              </div>
+
+              {/* Text Instructions */}
+              <div className="space-y-4 my-6 text-sm text-left max-h-96 overflow-y-auto">
                 <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[#426657] text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0 shadow-md">
                     1
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 dark:text-white">Drag &amp; Place</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Drag colored polyomino block pieces from the horizontal tray and position them cleanly onto the grid cells.</p>
+                  <div className="pt-0.5">
+                    <h4 className="font-bold text-gray-900 dark:text-white">Drag &amp; Place Blocks</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Pick up colored polyomino pieces from the tray at the bottom and drag them onto the grid. Position them carefully to fit.</p>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[#426657] text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0 shadow-md">
                     2
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 dark:text-white">Rotate &amp; Mirror</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Double-tap a block in the tray to rotate it 90 degrees clockwise, or click the mirror (↔) icon to horizontal-flip it.</p>
+                  <div className="pt-0.5">
+                    <h4 className="font-bold text-gray-900 dark:text-white">Rotate &amp; Mirror Pieces</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Double-tap a block to rotate it 90° clockwise. Use the mirror button (↔) or press 'M' to flip it horizontally. Keep rotating until it fits perfectly!</p>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[#426657] text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0 shadow-md">
                     3
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 dark:text-white">Perfect Fit Wins</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Fill every grid cell completely with NO overlaps and NO blocks left over to complete the puzzle!</p>
+                  <div className="pt-0.5">
+                    <h4 className="font-bold text-gray-900 dark:text-white">Complete Rows &amp; Columns</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">When you fill an entire row or column with blocks, it clears instantly! Combos happen when multiple lines clear at once.</p>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[#426657] text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-pink-600 text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0 shadow-md">
                     4
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 dark:text-white">Stars &amp; Par Limits</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Complete within the move limit and timer targets to secure a perfect 3-star gold rating.</p>
+                  <div className="pt-0.5">
+                    <h4 className="font-bold text-gray-900 dark:text-white">Fill the Entire Grid</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Place all pieces until the entire grid is filled with NO empty spaces and NO overlaps. Complete the puzzle to earn 1-3 stars!</p>
                   </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center font-mono text-xs font-bold flex-shrink-0 shadow-md">
+                    5
+                  </div>
+                  <div className="pt-0.5">
+                    <h4 className="font-bold text-gray-900 dark:text-white">Earn Stars &amp; Progress</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Complete levels within the move limit for more stars. 3 stars = perfect! Progress through campaigns to unlock harder challenges.</p>
+                  </div>
+                </div>
+
+                <div className="pt-2 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-3">
+                  <h4 className="font-bold text-blue-900 dark:text-blue-300 text-xs">💡 Pro Tips</h4>
+                  <ul className="text-xs text-blue-800 dark:text-blue-200 mt-2 space-y-1">
+                    <li>• Press 'U' to undo your last move</li>
+                    <li>• Use 'H' for hints when stuck</li>
+                    <li>• Press 'P' or Space to pause</li>
+                    <li>• Try the Daily Challenge for bonuses</li>
+                  </ul>
                 </div>
               </div>
 
-              {/* Close CTA */}
-              <button 
-                onClick={() => { sound.playClick(); setIsHowToPlayOpen(false); }}
-                className="w-full py-3.5 mt-6 bg-[#426657] hover:bg-[#345044] text-white rounded-2xl font-bold text-sm shadow-md"
-              >
-                Got It! Let's Fit
-              </button>
+              {/* Action Buttons */}
+              <div className="flex gap-3 mt-8">
+                <button 
+                  onClick={() => { sound.playClick(); setIsHowToPlayOpen(false); }}
+                  className="flex-1 py-3.5 bg-[#426657] hover:bg-[#345044] text-white rounded-2xl font-bold text-sm shadow-md transition-colors"
+                >
+                  Got It! Let's Play
+                </button>
+                <button 
+                  onClick={() => { sound.playClick(); setIsHowToPlayOpen(false); setCurrentScreen('level_select'); }}
+                  className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-sm shadow-md transition-colors"
+                >
+                  Start Campaign
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
