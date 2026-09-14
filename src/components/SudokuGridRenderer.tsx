@@ -9,7 +9,12 @@ import {
 
 interface SudokuGridRendererProps {
   gridData: SudokuGridData;
-  draggedBlock: any;
+  draggedBlock: {
+    id: string;
+    cells: [number, number][];
+    cellColors?: SudokuColor[];
+    color: string;
+  } | null;
   ghostPlacement: { x: number; y: number } | null;
   isGhostValid: boolean;
   onCellClick: (x: number, y: number) => void;

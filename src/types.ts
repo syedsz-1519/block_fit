@@ -52,6 +52,11 @@ export interface PlayerProfile {
   syncCode?: string;
   userId?: string;
   username: string;
+  guestCreatedAt?: string;
+  isLoggedIn?: boolean;
+  restrictedMode?: boolean;
+  userEmail?: string;
+  authToken?: string;
 }
 
 export interface LeaderboardEntry {

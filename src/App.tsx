@@ -45,7 +45,7 @@ import { PRESET_LEVELS, normalizeOffsets, rotateOffsets, mirrorOffsets } from '.
 import { sound } from './sound';
 import { LevelConfig, BlockShape, PlacedBlock, PlayerProfile, LeaderboardEntry } from './types';
 import { VictoryParticles } from './components/VictoryParticles';
-import { SudokuGridData, SudokuColor, SudokuValidator } from './sudokuLogic';
+import { SudokuGridData, SudokuColor } from './sudokuLogic';
 import { SudokuGridRenderer } from './components/SudokuGridRenderer';
 import { DemoVideoPlayer } from './components/DemoVideoPlayer';
 import {

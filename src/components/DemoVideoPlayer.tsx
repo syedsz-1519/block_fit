@@ -3,14 +3,13 @@ import { motion } from 'motion/react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 
 interface DemoVideoPlayerProps {
-  onClose?: () => void;
+  // Component props if needed in future
 }
 
-export const DemoVideoPlayer: React.FC<DemoVideoPlayerProps> = ({ onClose }) => {
+export const DemoVideoPlayer: React.FC<DemoVideoPlayerProps> = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
@@ -25,6 +24,24 @@ export const DemoVideoPlayer: React.FC<DemoVideoPlayerProps> = ({ onClose }) => 
     const percent = (e.clientX - rect.left) / rect.width;
     setProgress(percent * 100);
   };
+
+  // Auto-progress the video timeline when playing
+  React.useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        const newProgress = prev + 0.5; // Increment for smooth progress
+        if (newProgress >= 100) {
+          setIsPlaying(false);
+          return 0; // Reset when video ends
+        }
+        return newProgress;
+      });
+    }, 50); // Update every 50ms for smooth animation
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   return (
     <motion.div
@@ -76,8 +93,7 @@ export const DemoVideoPlayer: React.FC<DemoVideoPlayerProps> = ({ onClose }) => 
               className="w-full h-1 bg-gray-700 rounded-full mb-3 cursor-pointer hover:h-1.5 transition-all"
             >
               <motion.div
-                initial={{ width: '0%' }}
-                animate={{ width: isPlaying ? `${progress}%` : '0%' }}
+                animate={{ width: isPlaying ? `${progress}%` : `${progress}%` }}
                 transition={{ type: 'linear', duration: 0.05 }}
                 className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full"
               />
@@ -137,20 +153,19 @@ const AnimatedGameplayDemo: React.FC = () => {
   const gridSize = 4;
   const cellSize = 40;
 
-  // Sample blocks being placed
-  const [blocks, setBlocks] = React.useState([
-    { id: 1, x: 0, y: 0, width: 2, height: 1, color: '#f59e0b', delay: 0 },
-    { id: 2, x: 2, y: 0, width: 1, height: 2, color: '#3b82f6', delay: 0.3 },
-    { id: 3, x: 0, y: 1, width: 1, height: 2, color: '#10b981', delay: 0.6 },
-    { id: 4, x: 1, y: 1, width: 1, height: 1, color: '#ec4899', delay: 0.9 },
-  ]);
+  // Sample blocks being placed - using immutable block data
+  const blocksTemplate = [
+    { id: 1, x: 0, y: 0, width: 2, height: 1, color: '#f59e0b', initialDelay: 0 },
+    { id: 2, x: 2, y: 0, width: 1, height: 2, color: '#3b82f6', initialDelay: 0.3 },
+    { id: 3, x: 0, y: 1, width: 1, height: 2, color: '#10b981', initialDelay: 0.6 },
+    { id: 4, x: 1, y: 1, width: 1, height: 1, color: '#ec4899', initialDelay: 0.9 },
+  ];
+
+  const [animationPhase, setAnimationPhase] = React.useState(0);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setBlocks(prev => prev.map(block => ({
-        ...block,
-        delay: (block.delay + 3) % 12, // Cycle animation
-      })));
+      setAnimationPhase(prev => (prev + 1) % 4); // Cycle through 4 phases
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -176,43 +191,47 @@ const AnimatedGameplayDemo: React.FC = () => {
       </div>
 
       {/* Animated Blocks */}
-      {blocks.map(block => (
-        <motion.div
-          key={block.id}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            x: block.x * cellSize,
-            y: block.y * cellSize,
-          }}
-          transition={{
-            delay: block.delay,
-            duration: 0.5,
-            ease: 'easeOut',
-          }}
-          className="absolute rounded-lg shadow-lg"
-          style={{
-            backgroundColor: block.color,
-            width: block.width * cellSize,
-            height: block.height * cellSize,
-            opacity: 0.9,
-          }}
-        >
-          {/* Shine Effect */}
+      {blocksTemplate.map(block => {
+        // Show blocks based on animation phase
+        const shouldShow = block.id <= animationPhase + 1;
+        return shouldShow ? (
           <motion.div
+            key={block.id}
+            initial={{ opacity: 0, scale: 0 }}
             animate={{
-              opacity: [0, 0.3, 0],
+              opacity: 1,
+              scale: 1,
+              x: block.x * cellSize,
+              y: block.y * cellSize,
             }}
             transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              delay: block.delay,
+              delay: block.initialDelay,
+              duration: 0.5,
+              ease: 'easeOut',
             }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent rounded-lg"
-          />
-        </motion.div>
-      ))}
+            className="absolute rounded-lg shadow-lg"
+            style={{
+              backgroundColor: block.color,
+              width: block.width * cellSize,
+              height: block.height * cellSize,
+              opacity: 0.9,
+            }}
+          >
+            {/* Shine Effect */}
+            <motion.div
+              animate={{
+                opacity: [0, 0.3, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                delay: block.initialDelay,
+              }}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent rounded-lg"
+            />
+          </motion.div>
+        ) : null;
+      })}
 
       {/* Animation Labels */}
       <motion.div
