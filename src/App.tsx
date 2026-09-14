@@ -73,7 +73,7 @@ const formatDailyKey = (key: string) => {
 
 export default function App() {
   // --- Game Screen States ---
-  type Screen = 'splash' | 'main_menu' | 'level_select' | 'gameplay' | 'leaderboard' | 'subscription';
+  type Screen = 'splash' | 'main_menu' | 'level_select' | 'gameplay' | 'leaderboard' | 'subscription' | 'auth';
   const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
   
   // --- Core Player Profile ---
