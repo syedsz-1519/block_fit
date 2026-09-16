@@ -261,7 +261,7 @@ export class Board {
   /**
    * Check if any valid placements remain
    */
-  hasValidPlacement(blockShapes: readonly (readonly [number, number][])[]) {
+  hasValidPlacement(blockShapes: readonly (readonly (readonly [number, number])[])[]) {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         for (const shape of blockShapes) {

@@ -5,7 +5,8 @@
 
 import { Board } from '../core/Board';
 import { Block } from '../core/Block';
-import { PlacedBlock, BlockShape, GameSnapshot, GameState } from '../types/game.types';
+import { PlacedBlock, BlockShape, GameSnapshot } from '../types/game.types';
+import { GameState } from '../core/GameState';
 
 export interface ValidationResult {
   valid: boolean;
@@ -246,7 +247,7 @@ export class GameValidator {
   /**
    * Check if block placement matches shape
    */
-  static validateBlockShape(
+  static validateBlockPlacementShape(
     placement: PlacedBlock,
     originalShape: BlockShape
   ): ValidationResult {

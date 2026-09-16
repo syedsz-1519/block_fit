@@ -198,7 +198,7 @@ export class Grid {
    */
   static isPlayable(
     board: Board,
-    blockShapes: readonly (readonly [number, number][])[],
+    blockShapes: readonly (readonly (readonly [number, number])[])[],
     minFreeCells: number = 1
   ): boolean {
     const emptyCells = board.getEmptyCellCount();
@@ -266,7 +266,7 @@ export class Grid {
    */
   static findBestPlacement(
     board: Board,
-    blockCells: readonly [number, number][],
+    blockCells: readonly (readonly [number, number])[],
     strategy: 'top-left' | 'center' | 'bottom-right' = 'top-left'
   ): { x: number; y: number } | null {
     for (let y = 0; y < board.height; y++) {
@@ -293,7 +293,7 @@ export class Grid {
    */
   static getGravityPosition(
     board: Board,
-    blockCells: readonly [number, number][],
+    blockCells: readonly (readonly [number, number])[],
     startX: number,
     startY: number
   ): { x: number; y: number } {

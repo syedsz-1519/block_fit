@@ -14,6 +14,10 @@ import {
 export class EventBus implements EventListenerRegistry {
   private listenerMap = new Map<string, EventListener[]>();
   private eventHistory: GameEvent[] = [];
+
+  get listeners(): Map<string, EventListener[]> {
+    return this.listenerMap;
+  }
   private maxHistorySize = 100;
   private isProcessing = false;
   private pendingEvents: GameEvent[] = [];
