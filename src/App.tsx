@@ -2329,26 +2329,21 @@ export default function App() {
               <span>Continue with Google</span>
             </button>
 
-            {/* Play as Guest Option (Only if trial has not expired) */}
-            {!isTrialExpired ? (
-              <div className="text-center mt-5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    sound.playClick();
-                    setProfile(prev => ({ ...prev, restrictedMode: true }));
-                    setCurrentScreen('main_menu');
-                  }}
-                  className="text-xs font-bold opacity-60 hover:opacity-100 transition-opacity hover:underline"
-                >
-                  Play as Guest (Restricted Progress)
-                </button>
-              </div>
-            ) : (
-              <div className="text-center mt-5 text-[10px] text-red-500 font-extrabold tracking-wide">
-                🚫 Guest trial has expired. Please sign in or register to continue.
-              </div>
-            )}
+            {/* Play as Guest Option */}
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/60 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  setProfile(prev => ({ ...prev, restrictedMode: true }));
+                  setCurrentScreen('main_menu');
+                }}
+                className="w-full py-3 bg-[#426657]/10 hover:bg-[#426657]/20 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 text-[#426657] dark:text-emerald-400 border border-[#426657]/25 dark:border-emerald-500/30 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+              >
+                <span>🎮 Skip & Play as Guest</span>
+              </button>
+              <p className="text-[10px] opacity-50 mt-1.5 font-medium">No account required • Jump straight into the game</p>
+            </div>
 
           </div>
         </motion.div>
