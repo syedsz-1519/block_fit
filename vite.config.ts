@@ -13,10 +13,30 @@ export default defineConfig(() => {
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
+      // Do not modify — file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+    },
+    build: {
+      // Raise the warning threshold — we are actively splitting chunks below
+      chunkSizeWarningLimit: 600,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // React core — changes rarely, perfect for long-term browser caching
+            'vendor-react': ['react', 'react-dom'],
+            // Animation library
+            'vendor-motion': ['motion'],
+            // Charts library
+            'vendor-recharts': ['recharts'],
+            // Supabase auth/db client
+            'vendor-supabase': ['@supabase/supabase-js'],
+            // Icon library
+            'vendor-lucide': ['lucide-react'],
+          },
+        },
+      },
     },
   };
 });

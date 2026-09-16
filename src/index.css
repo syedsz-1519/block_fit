@@ -1,120 +1,205 @@
+/* Google Fonts — MUST be first before all other rules */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap');
+
 @import "tailwindcss";
 
 @theme {
-  /* Premium HSL-Tailored Color Palette */
-  --color-sage: #6d8f7f;
-  --color-coral: #dd6b55;
-  --color-mustard: #f3b33e;
-  --color-teal: #4aa0a5;
-  --color-lavender: #9c97b3;
-  --color-indigo-custom: #5c6ac4;
-  --color-rose-custom: #ec4899;
-  --color-emerald-custom: #10b981;
-  --color-amber-custom: #f59e0b;
-  --color-sky-custom: #0ea5e9;
-  --color-violet-custom: #8b5cf6;
+  /* === BLOCK FIT VIBRANT PALETTE === */
+  /* Each color maps to a block type on the board */
+  --color-bf-pink:    #FF4D8D;
+  --color-bf-blue:    #3B82F6;
+  --color-bf-yellow:  #FBBF24;
+  --color-bf-orange:  #FB7C36;
+  --color-bf-purple:  #8B5CF6;
+  --color-bf-teal:    #14B8A6;
+  --color-bf-green:   #22C55E;
+  --color-bf-red:     #EF4444;
+
+  /* UI accent colors */
+  --color-brand:      #6C47FF;
+  --color-brand-dark: #4F2EE8;
 }
 
+/* === GOOGLE FONTS === */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap');
+
 body {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  background: #F8F9FF;
+  color: #1A1A2E;
 }
 
 h1, h2, h3, .font-display {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
 }
 
-/* Glassmorphism & Card Utilities */
+/* ============================================================
+   BLOCK COLORS — used on the game board
+   ============================================================ */
+.bg-bf-pink   { background-color: var(--color-bf-pink); }
+.bg-bf-blue   { background-color: var(--color-bf-blue); }
+.bg-bf-yellow { background-color: var(--color-bf-yellow); }
+.bg-bf-orange { background-color: var(--color-bf-orange); }
+.bg-bf-purple { background-color: var(--color-bf-purple); }
+.bg-bf-teal   { background-color: var(--color-bf-teal); }
+.bg-bf-green  { background-color: var(--color-bf-green); }
+.bg-bf-red    { background-color: var(--color-bf-red); }
+
+/* legacy aliases so existing code still resolves */
+.bg-sage    { background-color: var(--color-bf-teal); }
+.bg-coral   { background-color: var(--color-bf-pink); }
+.bg-mustard { background-color: var(--color-bf-yellow); }
+.bg-teal    { background-color: var(--color-bf-blue); }
+.bg-lavender{ background-color: var(--color-bf-purple); }
+
+.border-sage-dark    { border-color: #0e9488; }
+.border-coral-dark   { border-color: #e91e63; }
+.border-mustard-dark { border-color: #f59e0b; }
+.border-teal-dark    { border-color: #2563eb; }
+.border-lavender-dark{ border-color: #7c3aed; }
+
+/* ============================================================
+   GLASS CARD — bright frosted glass on white/light bg
+   ============================================================ */
 .glass-card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 32px rgba(108, 71, 255, 0.08);
 }
 
-.dark .glass-card {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
+/* ============================================================
+   BUTTON MICRO-ANIMATIONS
+   ============================================================ */
 .glass-button {
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .glass-button:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 28px -8px rgba(66, 102, 87, 0.35);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 28px -8px rgba(108, 71, 255, 0.3);
 }
 .glass-button:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(0) scale(0.97);
 }
 
-/* Glowing animation effects */
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(2deg); }
+  50%       { transform: translateY(-10px) rotate(3deg); }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.04); }
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.06); }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50%       { transform: rotate( 3deg); }
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 3s ease-in-out infinite;
+@keyframes pop {
+  0%   { transform: scale(0.8); opacity: 0; }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1);   opacity: 1; }
 }
 
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(120px) rotate(360deg); opacity: 0; }
+}
+
+.animate-float       { animation: float      4s  ease-in-out infinite; }
+.animate-pulse-glow  { animation: pulseGlow  2.5s ease-in-out infinite; }
+.animate-wiggle      { animation: wiggle     0.6s ease-in-out infinite; }
+.animate-pop         { animation: pop        0.35s ease-out forwards; }
+
+/* Rainbow shimmer text */
 .shimmer-text {
-  background: linear-[#426657], #2e473d, #426657;
-  background-size: 200% auto;
+  background: linear-gradient(90deg, #FF4D8D, #8B5CF6, #3B82F6, #14B8A6, #FBBF24, #FF4D8D);
+  background-size: 300% auto;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
   animation: shimmer 3s linear infinite;
 }
 
-/* Custom styling for sleek block borders and animations */
-.bg-sage { background-color: var(--color-sage); }
-.border-sage-dark { border-color: #527061; }
-
-.bg-coral { background-color: var(--color-coral); }
-.border-coral-dark { border-color: #b84e3a; }
-
-.bg-mustard { background-color: var(--color-mustard); }
-.border-mustard-dark { border-color: #c68f29; }
-
-.bg-teal { background-color: var(--color-teal); }
-.border-teal-dark { border-color: #367e82; }
-
-.bg-lavender { background-color: var(--color-lavender); }
-.border-lavender-dark { border-color: #7a7593; }
-
-/* Glowing shadows and smooth micro-animations */
+/* ============================================================
+   BLOCK HOVER EFFECT
+   ============================================================ */
 .block-hover-effect {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.18s ease;
 }
 .block-hover-effect:hover {
-  transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15);
+  transform: scale(1.07) translateY(-3px);
+  box-shadow: 0 14px 28px -10px rgba(0, 0, 0, 0.18);
 }
 
-/* Custom styling for cells and board */
-.cell-glow-neon {
-  box-shadow: 0 0 12px rgba(255, 0, 127, 0.5);
+/* ============================================================
+   CELL GLOW VARIANTS
+   ============================================================ */
+.cell-glow-neon   { box-shadow: 0 0 14px rgba(255, 77, 141, 0.55); }
+.cell-glow-sunset { box-shadow: 0 0 14px rgba(251, 124, 54, 0.55); }
+.cell-glow-retro  { box-shadow: 0 0 14px rgba(34, 197, 94, 0.55); }
+.cell-glow-blue   { box-shadow: 0 0 14px rgba(59, 130, 246, 0.55); }
+.cell-glow-purple { box-shadow: 0 0 14px rgba(139, 92, 246, 0.55); }
+
+/* ============================================================
+   GRADIENT BACKGROUNDS FOR SCREENS
+   ============================================================ */
+.bg-screen-default {
+  background: linear-gradient(135deg, #F0F4FF 0%, #FDF0FF 50%, #FFF5F0 100%);
 }
-.cell-glow-sunset {
-  box-shadow: 0 0 12px rgba(252, 163, 17, 0.5);
+.bg-screen-play {
+  background: linear-gradient(160deg, #EEF2FF 0%, #F5F0FF 40%, #FFF0F6 100%);
 }
-.cell-glow-retro {
-  box-shadow: 0 0 12px rgba(57, 255, 20, 0.5);
+
+/* ============================================================
+   BRAND BUTTON
+   ============================================================ */
+.btn-brand {
+  background: linear-gradient(135deg, #6C47FF 0%, #9B5DE5 100%);
+  color: white;
+  border-radius: 18px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 6px 20px rgba(108, 71, 255, 0.35);
+}
+.btn-brand:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(108, 71, 255, 0.45);
+}
+.btn-brand:active {
+  transform: scale(0.97);
+}
+
+/* ============================================================
+   COLORFUL CARD ACCENTS
+   ============================================================ */
+.card-accent-pink   { border-top: 4px solid #FF4D8D; }
+.card-accent-blue   { border-top: 4px solid #3B82F6; }
+.card-accent-yellow { border-top: 4px solid #FBBF24; }
+.card-accent-purple { border-top: 4px solid #8B5CF6; }
+.card-accent-teal   { border-top: 4px solid #14B8A6; }
+.card-accent-orange { border-top: 4px solid #FB7C36; }
+
+/* ============================================================
+   SCROLLBAR (thin, colorful)
+   ============================================================ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#8B5CF6, #3B82F6);
+  border-radius: 99px;
 }

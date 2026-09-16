@@ -1981,41 +1981,41 @@ export default function App() {
     sound.playWin();
   };
 
-  // Colorful White Themes list
+  // Colorful bright themes — all light, each with a distinct pastel tint
   const THEME_CLASSES = {
-    light: 'light bg-[#FAFAF8] text-gray-900',
-    dark: 'light bg-[#F4F7FB] text-gray-900',
-    neon: 'light bg-[#FFFBF5] text-gray-900',
-    sunset: 'light bg-[#FFF5F5] text-gray-900',
-    retro: 'light bg-[#F0FDF4] text-gray-900'
+    light:  'light bg-[#F8F9FF] text-[#1A1A2E]',
+    dark:   'light bg-[#F0F4FF] text-[#1A1A2E]',
+    neon:   'light bg-[#FDF0FF] text-[#1A1A2E]',
+    sunset: 'light bg-[#FFF5F0] text-[#1A1A2E]',
+    retro:  'light bg-[#F0FDF4] text-[#1A1A2E]'
   };
 
   // Get dynamic board container wrapper class (Vibrant Light Theme)
   const getBoardClass = () => {
     switch (profile.theme) {
       case 'dark':
-        return 'bg-[#EAE6E1] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(0,0,0,0.04)] gap-1 border border-[#DFDAD4]';
+        return 'bg-[#EAF0FF] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(108,71,255,0.08),0_10px_30px_rgba(108,71,255,0.06)] gap-1 border border-[#D4DAFF]';
       case 'neon':
-        return 'bg-[#F2EBF9] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(189,0,255,0.08)] gap-1 border border-[#E4D5F5]';
+        return 'bg-[#F5EEFF] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(139,92,246,0.08),0_10px_30px_rgba(139,92,246,0.08)] gap-1 border border-[#E8D5FF]';
       case 'sunset':
-        return 'bg-[#FDF0E6] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(253,163,17,0.08)] gap-1 border border-[#F9E0CE]';
+        return 'bg-[#FFF0E8] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(251,124,54,0.08),0_10px_30px_rgba(251,124,54,0.08)] gap-1 border border-[#FFD9C2]';
       case 'retro':
-        return 'bg-[#E6F5E9] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(57,255,20,0.08)] gap-1 border border-[#CEEAD4]';
+        return 'bg-[#ECFDF5] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(20,184,166,0.08),0_10px_30px_rgba(20,184,166,0.08)] gap-1 border border-[#C0F4EA]';
       default:
-        return 'bg-[#EBE7E2] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(0,0,0,0.04)] gap-1 border border-[#DFDAD4]';
+        return 'bg-[#EEF0FF] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(108,71,255,0.06),0_10px_30px_rgba(108,71,255,0.06)] gap-1 border border-[#D4DAFF]';
     }
   };
 
   // Get dynamic cell backgrounds for board
   const getCellBgClass = (state: 'empty' | 'blocked' | 'filled', color?: string) => {
-    if (state === 'filled') return color || 'bg-sage';
+    if (state === 'filled') return color || 'bg-bf-purple';
     
     if (state === 'blocked') {
-      return 'bg-[#DBD6CF]/80 border border-[#C8C2BB]/40 shadow-inner';
+      return 'bg-[#C5C9E8]/70 border border-[#B0B6D8]/50 shadow-inner';
     }
     
-    // Empty cell state: Clean crisp white with subtle inner shadow
-    return 'bg-[#FFFFFF] border border-[#EBE7E2] shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]';
+    // Empty cell: bright white with a hint of the brand color
+    return 'bg-white border border-[#D4DAFF]/80 shadow-[inset_0_1px_2px_rgba(108,71,255,0.04)]';
   };
 
   // Get dynamic pattern overlays for colorblind mode
@@ -2087,23 +2087,28 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="flex-1 flex flex-col items-center justify-between py-16 px-6 relative overflow-hidden"
+            className="flex-1 flex flex-col items-center justify-between py-16 px-6 relative overflow-hidden bg-gradient-to-br from-[#F8F9FF] via-[#F0ECFF] to-[#FFF0F8]"
           >
+          {/* Decorative floating blobs */}
+          <div className="absolute top-10 left-6 w-20 h-20 bg-[#FF4D8D]/10 rounded-full blur-2xl" />
+          <div className="absolute top-24 right-8 w-16 h-16 bg-[#6C47FF]/10 rounded-full blur-xl" />
+          <div className="absolute bottom-32 left-10 w-24 h-24 bg-[#FBBF24]/10 rounded-full blur-2xl" />
           <div className="h-12" />
           
           <div className="flex flex-col items-center text-center">
-            {/* Tactics tactile logo */}
+            {/* Vibrant block logo */}
             <motion.div 
-              initial={{ scale: 0.8, rotate: -15, opacity: 0 }}
+              initial={{ scale: 0.6, rotate: -20, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 100, damping: 10 }}
-              className="w-32 h-32 rounded-3xl overflow-hidden shadow-2xl mb-8 bg-white p-4 flex items-center justify-center border border-gray-200"
+              transition={{ type: "spring", stiffness: 120, damping: 10 }}
+              className="w-32 h-32 rounded-[28px] overflow-hidden shadow-2xl mb-8 bg-white p-3 flex items-center justify-center"
+              style={{ boxShadow: '0 20px 60px rgba(108,71,255,0.2)' }}
             >
               <div className="grid grid-cols-2 grid-rows-2 gap-2 w-full h-full">
-                <div className="bg-[#a8cfbd] rounded-lg shadow-sm" />
-                <div className="bg-[#e49a8e] rounded-lg shadow-sm" />
-                <div className="bg-[#e6c88e] rounded-lg shadow-sm" />
-                <div className="bg-[#8ec9c4] rounded-lg shadow-sm" />
+                <div className="bg-[#FF4D8D] rounded-xl shadow-sm" />
+                <div className="bg-[#6C47FF] rounded-xl shadow-sm" />
+                <div className="bg-[#FBBF24] rounded-xl shadow-sm" />
+                <div className="bg-[#14B8A6] rounded-xl shadow-sm" />
               </div>
             </motion.div>
 
@@ -2111,32 +2116,33 @@ export default function App() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="font-display text-4xl font-extrabold tracking-tight mb-2 text-primary dark:text-white"
+              className="font-display text-5xl font-bold tracking-tight mb-2 shimmer-text"
             >
               Block Fit
             </motion.h1>
 
             <motion.p 
               initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 0.8 }}
+              animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="font-body-lg text-sm italic tracking-widest uppercase text-[#426657]"
+              className="text-sm font-bold tracking-widest uppercase text-[#6C47FF]/70"
             >
-              Think. Fit. Win.
+              ✦ Think. Fit. Win. ✦
             </motion.p>
           </div>
 
           <div className="w-full max-w-xs flex flex-col items-center">
             <div className="w-full mb-8">
               <div className="flex justify-between items-end mb-2 text-xs">
-                <span className="opacity-70 font-semibold tracking-wider uppercase">Initialising...</span>
-                <span className="font-bold text-sm">{splashProgress}%</span>
+                <span className="font-bold tracking-wider uppercase text-[#6C47FF]/60">Loading...</span>
+                <span className="font-black text-sm text-[#6C47FF]">{splashProgress}%</span>
               </div>
-              <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-2.5 w-full bg-white/60 rounded-full overflow-hidden shadow-inner border border-[#6C47FF]/10">
                 <motion.div 
-                  className="h-full bg-[#426657] rounded-full"
+                  className="h-full rounded-full"
+                  style={{ background: 'linear-gradient(90deg, #FF4D8D, #6C47FF, #14B8A6)' }}
                   animate={{ width: `${splashProgress}%` }}
-                  transition={{ duration: 0.1 }}
+                  transition={{ duration: 0.12 }}
                 />
               </div>
             </div>
@@ -2147,13 +2153,13 @@ export default function App() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 px-5 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-full shadow-md"
+              className="flex items-center gap-2 px-5 py-3 bg-white rounded-2xl shadow-lg border border-[#6C47FF]/10"
             >
-              <Lightbulb className="w-4 h-4 text-[#e6c88e] animate-pulse" />
-              <span className="text-xs font-medium italic opacity-80">{splashTip}</span>
+              <Lightbulb className="w-4 h-4 text-[#FBBF24] animate-pulse" />
+              <span className="text-xs font-semibold text-[#1A1A2E]/70 italic">{splashTip}</span>
             </motion.div>
           </div>
-          <div className="absolute bottom-4 right-4 text-[10px] opacity-40 font-mono">v1.0.0</div>
+          <div className="absolute bottom-4 right-4 text-[10px] opacity-30 font-mono">v1.0.0</div>
         </motion.div>
       )}
 
@@ -2165,54 +2171,58 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -15 }}
           transition={{ duration: 0.25, ease: "easeInOut" }}
-          className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-hidden"
+          className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-hidden bg-gradient-to-br from-[#F8F9FF] via-[#F0ECFF] to-[#FFF0F8]"
         >
-          {/* Backdrop/Accent */}
-          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#426657]/10 to-transparent -z-10" />
+          {/* Decorative blobs */}
+          <div className="absolute top-8 left-6 w-28 h-28 bg-[#6C47FF]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-16 right-6 w-24 h-24 bg-[#FF4D8D]/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute bottom-8 left-10 w-20 h-20 bg-[#FBBF24]/10 rounded-full blur-2xl pointer-events-none" />
 
-          <div className="w-full max-w-sm bg-white dark:bg-gray-950 rounded-3xl p-6 border border-gray-150/10 dark:border-gray-900 shadow-2xl relative">
+          <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl relative" style={{ boxShadow: '0 24px 64px rgba(108,71,255,0.15)' }}>
             
             {/* Header */}
             <div className="text-center mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-[#426657]/10 dark:bg-emerald-950/30 flex items-center justify-center mx-auto mb-3 border border-[#426657]/20">
-                <Key className="w-6 h-6 text-[#426657] dark:text-emerald-400" />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #6C47FF, #FF4D8D)' }}>
+                <Key className="w-7 h-7 text-white" />
               </div>
-              <h2 className="font-display text-2xl font-extrabold text-primary dark:text-white">
-                {authMode === 'login' ? 'Welcome Back' : 'Create Account'}
+              <h2 className="font-display text-2xl font-bold text-[#1A1A2E]">
+                {authMode === 'login' ? '👋 Welcome Back!' : '🎉 Join Block Fit'}
               </h2>
-              <p className="text-xs opacity-70 mt-1">
-                {authMode === 'login' ? 'Sign in to sync your puzzle progress' : 'Get a personal cloud account to save your progress'}
+              <p className="text-xs text-[#1A1A2E]/50 mt-1 font-semibold">
+                {authMode === 'login' ? 'Sign in to sync your puzzle progress' : 'Create an account to save your progress'}
               </p>
             </div>
 
             {/* Error Message */}
             {authErrorMessage && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs rounded-2xl p-3 mb-4 font-medium">
+              <div className="bg-red-50 border border-red-200 text-red-600 text-xs rounded-2xl p-3 mb-4 font-semibold">
                 ⚠️ {authErrorMessage}
               </div>
             )}
 
             {/* Toggle Tabs */}
-            <div className="flex bg-gray-100/70 dark:bg-gray-900/50 p-1 rounded-2xl border border-gray-200/50 dark:border-gray-800/40 mb-5">
+            <div className="flex bg-[#F0ECFF] p-1 rounded-2xl mb-5">
               <button
                 type="button"
                 onClick={() => { sound.playClick(); setAuthMode('login'); setAuthErrorMessage(''); }}
-                className={`flex-1 py-2 text-xs font-extrabold rounded-xl transition-all ${
+                className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all ${
                   authMode === 'login'
-                    ? 'bg-[#426657] text-white shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                    ? 'text-white shadow-sm'
+                    : 'text-[#6C47FF]/60 hover:text-[#6C47FF]'
                 }`}
+                style={authMode === 'login' ? { background: 'linear-gradient(135deg, #6C47FF, #9B5DE5)' } : {}}
               >
                 Sign In
               </button>
               <button
                 type="button"
                 onClick={() => { sound.playClick(); setAuthMode('signup'); setAuthErrorMessage(''); }}
-                className={`flex-1 py-2 text-xs font-extrabold rounded-xl transition-all ${
+                className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all ${
                   authMode === 'signup'
-                    ? 'bg-[#426657] text-white shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                    ? 'text-white shadow-sm'
+                    : 'text-[#6C47FF]/60 hover:text-[#6C47FF]'
                 }`}
+                style={authMode === 'signup' ? { background: 'linear-gradient(135deg, #6C47FF, #9B5DE5)' } : {}}
               >
                 Register
               </button>
@@ -2222,58 +2232,58 @@ export default function App() {
             <form onSubmit={handleAuthSubmit} className="space-y-4">
               {authMode === 'signup' && (
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-widest opacity-60">Username</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-[#6C47FF]/60">Username</label>
                   <input
                     type="text"
                     required
                     value={authUsername}
                     onChange={(e) => setAuthUsername(e.target.value)}
                     placeholder="e.g. PuzzleGuru"
-                    className="w-full mt-1.5 bg-gray-100 dark:bg-gray-900 border border-transparent focus:border-emerald-500 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-primary dark:text-white"
+                    className="w-full mt-1.5 bg-[#F8F9FF] border-2 border-[#6C47FF]/10 focus:border-[#6C47FF] focus:outline-none rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] font-semibold transition-colors"
                   />
                 </div>
               )}
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest opacity-60">Email Address</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-[#6C47FF]/60">Email Address</label>
                 <input
                   type="email"
                   required
                   value={authEmail}
                   onChange={(e) => setAuthEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full mt-1.5 bg-gray-100 dark:bg-gray-900 border border-transparent focus:border-emerald-500 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-primary dark:text-white"
+                  className="w-full mt-1.5 bg-[#F8F9FF] border-2 border-[#6C47FF]/10 focus:border-[#6C47FF] focus:outline-none rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] font-semibold transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest opacity-60">Password</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-[#6C47FF]/60">Password</label>
                 <input
                   type="password"
                   required
                   value={authPassword}
                   onChange={(e) => setAuthPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full mt-1.5 bg-gray-100 dark:bg-gray-900 border border-transparent focus:border-emerald-500 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-primary dark:text-white"
+                  className="w-full mt-1.5 bg-[#F8F9FF] border-2 border-[#6C47FF]/10 focus:border-[#6C47FF] focus:outline-none rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] font-semibold transition-colors"
                 />
               </div>
 
               {/* Terms and Conditions Checkbox (Sign Up Mode Only) */}
               {authMode === 'signup' && (
                 <div className="pt-2">
-                  <label className="flex items-start gap-2.5 text-xs opacity-85 cursor-pointer select-none leading-tight">
+                  <label className="flex items-start gap-2.5 text-xs text-[#1A1A2E]/70 cursor-pointer select-none leading-tight">
                     <input
                       type="checkbox"
                       checked={termsAccepted}
                       onChange={(e) => setTermsAccepted(e.target.checked)}
-                      className="mt-0.5 accent-[#426657]"
+                      className="mt-0.5 accent-[#6C47FF]"
                     />
                     <span>
                       I agree to the{' '}
                       <button
                         type="button"
                         onClick={() => { sound.playClick(); setShowTermsModal(true); }}
-                        className="text-[#426657] dark:text-emerald-400 font-extrabold underline hover:text-[#355246]"
+                        className="text-[#6C47FF] font-bold underline"
                       >
                         Privacy Policy & Terms
                       </button>
@@ -2286,12 +2296,12 @@ export default function App() {
               <button
                 type="submit"
                 disabled={authLoading || (authMode === 'signup' && !termsAccepted)}
-                className="w-full py-3.5 bg-[#426657] hover:bg-[#355246] disabled:opacity-50 text-white rounded-2xl font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+                className="w-full py-3.5 disabled:opacity-50 text-white rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2 btn-brand"
               >
                 {authLoading ? (
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <span>{authMode === 'login' ? 'Sign In' : 'Create Account'}</span>
+                  <span>{authMode === 'login' ? '🚀 Sign In' : '✨ Create Account'}</span>
                 )}
               </button>
             </form>
@@ -2299,9 +2309,9 @@ export default function App() {
             {/* Divider */}
             <div className="relative my-5 flex items-center justify-center">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200/50 dark:border-gray-800" />
+                <div className="w-full border-t border-[#6C47FF]/10" />
               </div>
-              <span className="relative px-3 bg-white dark:bg-gray-900 text-[10px] font-bold uppercase tracking-wider opacity-45">
+              <span className="relative px-3 bg-white text-[10px] font-black uppercase tracking-wider text-[#6C47FF]/40">
                 Or
               </span>
             </div>
@@ -2309,7 +2319,7 @@ export default function App() {
             {/* Google Login */}
             <button
               onClick={handleGoogleLogin}
-              className="w-full py-3.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 rounded-2xl font-bold text-xs text-primary dark:text-white flex items-center justify-center gap-2 transition-all shadow-sm"
+              className="w-full py-3 bg-white border-2 border-gray-100 hover:border-[#6C47FF]/20 hover:bg-[#F8F9FF] rounded-2xl font-bold text-xs text-[#1A1A2E] flex items-center justify-center gap-2 transition-all shadow-sm"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.48 0-6.3-2.82-6.3-6.3s2.82-6.3 6.3-6.3c1.558 0 2.978.569 4.08 1.505l2.972-2.972C18.98 2.502 15.792 1.5 12.24 1.5 6.363 1.5 1.5 6.363 1.5 12.24s4.863 10.74 10.74 10.74c6.111 0 11.232-4.402 11.232-10.74 0-.693-.075-1.349-.195-1.955H12.24Z" />
@@ -2317,8 +2327,8 @@ export default function App() {
               <span>Continue with Google</span>
             </button>
 
-            {/* Play as Guest Option */}
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/60 text-center">
+            {/* Play as Guest — BIG prominent button */}
+            <div className="mt-4 pt-4 border-t-2 border-dashed border-[#6C47FF]/10">
               <button
                 type="button"
                 onClick={() => {
@@ -2326,11 +2336,11 @@ export default function App() {
                   setProfile(prev => ({ ...prev, restrictedMode: true }));
                   setCurrentScreen('main_menu');
                 }}
-                className="w-full py-3 bg-[#426657]/10 hover:bg-[#426657]/20 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 text-[#426657] dark:text-emerald-400 border border-[#426657]/25 dark:border-emerald-500/30 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+                className="w-full py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2 border-2 border-[#14B8A6] text-[#14B8A6] hover:bg-[#14B8A6] hover:text-white"
               >
-                <span>🎮 Skip & Play as Guest</span>
+                <span>🎮 Play as Guest — No Signup!</span>
               </button>
-              <p className="text-[10px] opacity-50 mt-1.5 font-medium">No account required • Jump straight into the game</p>
+              <p className="text-[10px] text-center text-[#1A1A2E]/40 mt-2 font-semibold">Jump straight in • No account needed</p>
             </div>
 
           </div>
@@ -2538,21 +2548,22 @@ export default function App() {
                     duration: 4,
                     ease: "easeInOut"
                   }}
-                  className="w-24 h-24 rounded-3xl overflow-hidden shadow-xl mb-4 bg-white dark:bg-gray-900 p-3 flex items-center justify-center border border-gray-150 dark:border-gray-800"
+                  className="w-24 h-24 rounded-3xl overflow-hidden shadow-xl mb-4 bg-white p-3 flex items-center justify-center"
+                  style={{ boxShadow: '0 12px 40px rgba(108,71,255,0.18)' }}
                 >
                   <div className="grid grid-cols-2 grid-rows-2 gap-1.5 w-full h-full">
-                    <div className="bg-[#a8cfbd] rounded-lg shadow-inner" />
-                    <div className="bg-[#e49a8e] rounded-lg shadow-inner" />
-                    <div className="bg-[#e6c88e] rounded-lg shadow-inner" />
-                    <div className="bg-[#8ec9c4] rounded-lg shadow-inner" />
+                    <div className="bg-[#FF4D8D] rounded-xl" />
+                    <div className="bg-[#6C47FF] rounded-xl" />
+                    <div className="bg-[#FBBF24] rounded-xl" />
+                    <div className="bg-[#14B8A6] rounded-xl" />
                   </div>
                 </motion.div>
                 
-                <h2 className="font-display text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                <h2 className="font-display text-3xl font-bold tracking-tight shimmer-text">
                   Block Fit Puzzle
                 </h2>
-                <p className="text-xs italic tracking-widest uppercase text-[#426657] dark:text-emerald-400 font-semibold mt-1">
-                  Think. Fit. Win.
+                <p className="text-xs font-bold tracking-widest uppercase text-[#6C47FF]/60 mt-1">
+                  ✦ Think. Fit. Win. ✦
                 </p>
 
                 {/* Bouncy Streak Badge */}
@@ -2575,29 +2586,30 @@ export default function App() {
                     const lvl = PRESET_LEVELS.find(l => l.id === profile.currentLevel) || PRESET_LEVELS[0];
                     startLevel(lvl);
                   }}
-                  className="w-full text-left bg-gradient-to-r from-[#426657] to-[#5a8674] dark:from-emerald-900 dark:to-teal-950 text-white p-5 rounded-3xl shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden flex items-center justify-between group"
+                  className="w-full text-left text-white p-5 rounded-3xl shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden flex items-center justify-between group"
+                  style={{ background: 'linear-gradient(135deg, #6C47FF 0%, #FF4D8D 100%)' }}
                 >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -z-10 group-hover:scale-125 transition-transform" />
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -z-10 group-hover:scale-125 transition-transform" />
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shadow-inner">
-                      <Play className="w-6 h-6 fill-current text-white animate-pulse" />
+                    <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center shadow-inner">
+                      <Play className="w-7 h-7 fill-current text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-extrabold uppercase tracking-wide">
-                        {playButtonState === 'StartJourney' && "▶ PLAY"}
+                      <h3 className="text-2xl font-black uppercase tracking-wide">
+                        {playButtonState === 'StartJourney' && "▶ PLAY!"}
                         {playButtonState === 'Continue' && "▶ CONTINUE"}
-                        {playButtonState === 'DailyAvailable' && "▶ DAILY READY"}
-                        {playButtonState === 'AllComplete' && "▶ PLAY RANDOM"}
+                        {playButtonState === 'DailyAvailable' && "▶ DAILY!"}
+                        {playButtonState === 'AllComplete' && "▶ RANDOM"}
                       </h3>
-                      <p className="text-xs text-white/80 font-medium mt-0.5">
-                        {playButtonState === 'StartJourney' && "Start your geometric journey"}
+                      <p className="text-xs text-white/80 font-semibold mt-0.5">
+                        {playButtonState === 'StartJourney' && "Start your colorful journey"}
                         {playButtonState === 'Continue' && `Resume Level ${profile.currentLevel}`}
-                        {playButtonState === 'DailyAvailable' && "Special daily level is available"}
-                        {playButtonState === 'AllComplete' && "Conquered all! Replay standard levels"}
+                        {playButtonState === 'DailyAvailable' && "Today's special puzzle awaits!"}
+                        {playButtonState === 'AllComplete' && "Conquered all! Try a random one"}
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-6 h-6 text-white/50 group-hover:text-white transition-colors" />
+                  <ChevronRight className="w-6 h-6 text-white/60 group-hover:text-white transition-colors" />
                 </button>
               </section>
 
