@@ -1981,26 +1981,26 @@ export default function App() {
     sound.playWin();
   };
 
-  // Themes list
+  // Colorful White Themes list
   const THEME_CLASSES = {
-    light: 'light bg-[#fdf8f8] text-gray-900',
-    dark: 'dark bg-[#0F172A] text-gray-100',
-    neon: 'neon bg-[#07051a] text-[#00ffcc]',
-    sunset: 'sunset bg-[#241315] text-[#fca311]',
-    retro: 'retro bg-[#0a1005] text-[#39ff14]'
+    light: 'light bg-[#FAFAF8] text-gray-900',
+    dark: 'light bg-[#F4F7FB] text-gray-900',
+    neon: 'light bg-[#FFFBF5] text-gray-900',
+    sunset: 'light bg-[#FFF5F5] text-gray-900',
+    retro: 'light bg-[#F0FDF4] text-gray-900'
   };
 
-  // Get dynamic board container wrapper class
+  // Get dynamic board container wrapper class (Vibrant Light Theme)
   const getBoardClass = () => {
     switch (profile.theme) {
       case 'dark':
-        return 'bg-[#18181b]/90 p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_4px_12px_rgba(0,0,0,0.6)] gap-1 border border-[#27272a]';
+        return 'bg-[#EAE6E1] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(0,0,0,0.04)] gap-1 border border-[#DFDAD4]';
       case 'neon':
-        return 'bg-[#0f0b29]/95 p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_0_20px_rgba(255,0,127,0.15)] gap-1 border border-[#ff007f]/30';
+        return 'bg-[#F2EBF9] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(189,0,255,0.08)] gap-1 border border-[#E4D5F5]';
       case 'sunset':
-        return 'bg-[#1c0c0e]/95 p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_4px_12px_rgba(0,0,0,0.8)] gap-1 border border-[#fca311]/30';
+        return 'bg-[#FDF0E6] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(253,163,17,0.08)] gap-1 border border-[#F9E0CE]';
       case 'retro':
-        return 'bg-[#040602]/95 p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_4px_12px_rgba(0,0,0,0.8)] gap-1 border border-[#39ff14]/30';
+        return 'bg-[#E6F5E9] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(57,255,20,0.08)] gap-1 border border-[#CEEAD4]';
       default:
         return 'bg-[#EBE7E2] p-3 rounded-[28px] grid w-full max-w-[360px] aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.06),0_10px_30px_rgba(0,0,0,0.04)] gap-1 border border-[#DFDAD4]';
     }
@@ -2011,23 +2011,11 @@ export default function App() {
     if (state === 'filled') return color || 'bg-sage';
     
     if (state === 'blocked') {
-      switch (profile.theme) {
-        case 'dark': return 'bg-[#141416]/80 border border-gray-900/40 opacity-40 shadow-inner';
-        case 'neon': return 'bg-[#07051a]/80 border border-[#ff007f]/5 opacity-30';
-        case 'sunset': return 'bg-[#1c0c0e]/80 border border-[#fca311]/5 opacity-30';
-        case 'retro': return 'bg-[#040602]/80 border border-[#39ff14]/5 opacity-30';
-        default: return 'bg-[#E5E0DA]/80 border border-[#D5D0CA]/40 shadow-inner';
-      }
+      return 'bg-[#DBD6CF]/80 border border-[#C8C2BB]/40 shadow-inner';
     }
     
-    // Empty state
-    switch (profile.theme) {
-      case 'dark': return 'bg-[#202023] border border-gray-800/80 shadow-[inset_0_1px_3px_rgba(0,0,0,0.2)]';
-      case 'neon': return 'bg-[#150f38] border border-[#ff007f]/20 shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]';
-      case 'sunset': return 'bg-[#3a1d21] border border-[#fca311]/15 shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]';
-      case 'retro': return 'bg-[#14200c] border border-[#39ff14]/20 shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]';
-      default: return 'bg-[#F5F2EF] border border-[#EBE7E2] shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]';
-    }
+    // Empty cell state: Clean crisp white with subtle inner shadow
+    return 'bg-[#FFFFFF] border border-[#EBE7E2] shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]';
   };
 
   // Get dynamic pattern overlays for colorblind mode
