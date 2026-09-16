@@ -15,6 +15,74 @@
   --color-violet-custom: #8b5cf6;
 }
 
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3, .font-display {
+  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Glassmorphism & Card Utilities */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.dark .glass-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-button {
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.glass-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 28px -8px rgba(66, 102, 87, 0.35);
+}
+.glass-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Glowing animation effects */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.shimmer-text {
+  background: linear-[#426657], #2e473d, #426657;
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
 /* Custom styling for sleek block borders and animations */
 .bg-sage { background-color: var(--color-sage); }
 .border-sage-dark { border-color: #527061; }
@@ -42,11 +110,11 @@
 
 /* Custom styling for cells and board */
 .cell-glow-neon {
-  box-shadow: 0 0 8px rgba(255, 0, 127, 0.4);
+  box-shadow: 0 0 12px rgba(255, 0, 127, 0.5);
 }
 .cell-glow-sunset {
-  box-shadow: 0 0 8px rgba(252, 163, 17, 0.4);
+  box-shadow: 0 0 12px rgba(252, 163, 17, 0.5);
 }
 .cell-glow-retro {
-  box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.5);
 }
